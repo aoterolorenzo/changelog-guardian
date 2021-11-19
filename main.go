@@ -16,12 +16,10 @@ limitations under the License.
 package main
 
 import (
-	"gitlab.com/aoterocom/changelog-guardian/cmd"
-	"os"
+	"gitlab.com/aoterocom/changelog-guardian/cli"
 )
 
 func main() {
 
-	os.Exit(1)
-	cmd.Execute()
+	cli.Execute()
 }

@@ -1,20 +1,21 @@
-package controllers
+package providers
 
 import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	models "gitlab.com/aoterocom/changelog-guardian/models/git"
+	models2 "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"os"
+	"time"
 )
 
-type GitController struct {
+type GitProvider struct {
 }
 
-func NewGitController() *GitController {
-	return &GitController{}
+func NewGitController() *GitProvider {
+	return &GitProvider{}
 }
 
-func (gc *GitController) getTags() (*[]models.Tag, error) {
+func (gc *GitProvider) GetReleases() (*[]models2.Release, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -30,7 +31,7 @@ func (gc *GitController) getTags() (*[]models.Tag, error) {
 		return nil, err
 	}
 
-	var tags []models.Tag
+	var tags []models2.Release
 
 	err = gitTags.ForEach(func(t *plumbing.Reference) error {
 		revHash, err := r.ResolveRevision(plumbing.Revision(t.Name()))
@@ -43,7 +44,7 @@ func (gc *GitController) getTags() (*[]models.Tag, error) {
 			return nil
 		}
 
-		tag := models.NewTag(t.Name().Short(), models.Hash(revHash.String()), commit.Author.When)
+		tag := models2.NewRelease(t.Name().Short(), models2.Hash(revHash.String()), commit.Author.When)
 		tags = append(tags, *tag)
 
 		return nil
@@ -55,11 +56,7 @@ func (gc *GitController) getTags() (*[]models.Tag, error) {
 	return &tags, nil
 }
 
-func (gc *GitController) getLastTag() (*models.Tag, error) {
-	tags, err := gc.getTags()
-	if err != nil {
-		return nil, err
-	}
-
-	return &(*tags)[len(*tags)-1], err
+func (gc *GitProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]models2.Task, error) {
+	//TODO: Implement GetTasks method
+	return nil, nil
 }

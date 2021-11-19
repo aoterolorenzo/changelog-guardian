@@ -3,8 +3,8 @@ package models
 import (
 	"fmt"
 	"github.com/magiconair/properties/assert"
-	"gitlab.com/aoterocom/changelog-guardian/models"
-	"gitlab.com/aoterocom/changelog-guardian/services"
+	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	"io/ioutil"
 	"testing"
 )

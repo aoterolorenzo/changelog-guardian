@@ -31,7 +31,7 @@ func (c *Changelog) String() string {
 		changelogStr += "\n"
 		for i, release := range c.Releases {
 			changelogStr += "[" + release.Version + "]: " + release.Link
-			if i != len(c.Releases) - 1 {
+			if i != len(c.Releases)-1 {
 				changelogStr += fmt.Sprintln()
 			}
 		}
