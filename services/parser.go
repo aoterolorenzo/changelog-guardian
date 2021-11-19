@@ -3,7 +3,7 @@ package services
 import (
 	"bufio"
 	"bytes"
-	"gitlab.com/aoterocom/CLogger/models"
+	"gitlab.com/aoterocom/changelog-guardian/models"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -56,7 +56,6 @@ func ParseChangelog(pathToChangelog string) *models.Changelog {
 	return c
 }
 
-
 func ParseTask(line string) *models.Task {
 
 	t := models.NewEmptyTask()
@@ -106,7 +105,6 @@ func ParseRelease(line string, fullChangelog string) *models.Release {
 	return r
 }
 
-
 func ParseCategory(line string) models.Category {
 	r := regexp.MustCompile(categoryRegexp)
 	match := r.FindStringSubmatch(line)
@@ -118,7 +116,6 @@ func ParseCategory(line string) models.Category {
 	}
 	return models.Category(paramsMap["category"])
 }
-
 
 func reverseAny(s interface{}) {
 	n := reflect.ValueOf(s).Len()
