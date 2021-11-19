@@ -3,7 +3,7 @@ package services
 import (
 	"bufio"
 	"bytes"
-	"gitlab.com/aoterocom/changelog-guardian/models"
+	models2 "gitlab.com/aoterocom/changelog-guardian/application/models"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -16,14 +16,14 @@ const releaseRegexp = `## \[(?P<releaseVersion>[^\]]+)]( - (?P<releaseDate>[0-9]
 const releaseLinkRegexp = `\[VERSION]: (?P<releaseLink>.*)`
 const categoryRegexp = `### (?P<category>.*)`
 
-func ParseChangelog(pathToChangelog string) *models.Changelog {
-	c := models.NewEmptyChangelog()
+func ParseChangelog(pathToChangelog string) *models2.Changelog {
+	c := models2.NewEmptyChangelog()
 	changelogReader, err := os.Open(pathToChangelog)
 	if err != nil {
 		panic(err)
 	}
 
-	var currentCategory models.Category
+	var currentCategory models2.Category
 
 	fullChangelog, err := ioutil.ReadFile(pathToChangelog)
 	if err != nil {
@@ -35,7 +35,7 @@ func ParseChangelog(pathToChangelog string) *models.Changelog {
 	for fscanner.Scan() {
 		line := fscanner.Text()
 		if bytes.HasPrefix([]byte(line), []byte("## ")) {
-			release := models.NewEmptyRelease()
+			release := models2.NewEmptyRelease()
 			release = ParseRelease(line, string(fullChangelog))
 			reverseAny(c.Releases)
 			c.Releases = append(c.Releases, *release)
@@ -47,7 +47,7 @@ func ParseChangelog(pathToChangelog string) *models.Changelog {
 		}
 
 		if bytes.HasPrefix([]byte(line), []byte("- ")) {
-			task := models.NewEmptyTask()
+			task := models2.NewEmptyTask()
 			task = ParseTask(line)
 			c.Releases[0].Sections[currentCategory] = append(c.Releases[0].Sections[currentCategory], *task)
 		}
@@ -56,9 +56,9 @@ func ParseChangelog(pathToChangelog string) *models.Changelog {
 	return c
 }
 
-func ParseTask(line string) *models.Task {
+func ParseTask(line string) *models2.Task {
 
-	t := models.NewEmptyTask()
+	t := models2.NewEmptyTask()
 	r := regexp.MustCompile(taskRegexp)
 	match := r.FindStringSubmatch(line)
 	paramsMap := make(map[string]string)
@@ -76,9 +76,9 @@ func ParseTask(line string) *models.Task {
 }
 
 // Map a task string to a Task struct
-func ParseRelease(line string, fullChangelog string) *models.Release {
+func ParseRelease(line string, fullChangelog string) *models2.Release {
 
-	r := models.NewEmptyRelease()
+	r := models2.NewEmptyRelease()
 	rg := regexp.MustCompile(releaseRegexp)
 	match := rg.FindStringSubmatch(line)
 	paramsMap := make(map[string]string)
@@ -105,7 +105,7 @@ func ParseRelease(line string, fullChangelog string) *models.Release {
 	return r
 }
 
-func ParseCategory(line string) models.Category {
+func ParseCategory(line string) models2.Category {
 	r := regexp.MustCompile(categoryRegexp)
 	match := r.FindStringSubmatch(line)
 	paramsMap := make(map[string]string)
@@ -114,7 +114,7 @@ func ParseCategory(line string) models.Category {
 			paramsMap[name] = match[i]
 		}
 	}
-	return models.Category(paramsMap["category"])
+	return models2.Category(paramsMap["category"])
 }
 
 func reverseAny(s interface{}) {

@@ -4,14 +4,14 @@ import "time"
 
 type Hash string
 
-type Tag struct {
+type Release struct {
 	Name string
 	Hash Hash
 	Time time.Time
 }
 
-func NewTag(name string, hash Hash, time time.Time) *Tag {
-	return &Tag{
+func NewRelease(name string, hash Hash, time time.Time) *Release {
+	return &Release{
 		Name: name,
 		Hash: hash,
 		Time: time,

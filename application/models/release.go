@@ -7,21 +7,20 @@ import (
 	"strings"
 )
 
-
 type Release struct {
-	Version 	string
-	Date		string
-	Link		string
-	Yanked		bool
-	Sections 	map[Category][]Task
+	Version  string
+	Date     string
+	Link     string
+	Yanked   bool
+	Sections map[Category][]Task
 }
 
 func NewRelease(version string, date string, link string, yanked bool, sections map[Category][]Task) *Release {
 	return &Release{
-		Version: version,
-		Date: date,
-		Link: link,
-		Yanked: yanked,
+		Version:  version,
+		Date:     date,
+		Link:     link,
+		Yanked:   yanked,
 		Sections: sections}
 }
 
@@ -43,12 +42,12 @@ func (r *Release) String() string {
 		dateStr = " - " + r.Date
 	}
 
-	if  strings.ToUpper(r.Version) == "UNRELEASED" {
+	if strings.ToUpper(r.Version) == "UNRELEASED" {
 		dateStr = ""
 	}
 
 	releaseStr := fmt.Sprintf("\n## [%s]%s%s", r.Version, dateStr, yankedStr)
-	releaseStr  += "\n"
+	releaseStr += "\n"
 
 	keys := make([]string, 0, len(r.Sections))
 	for k := range r.Sections {
@@ -57,10 +56,10 @@ func (r *Release) String() string {
 	sort.Strings(keys)
 
 	for _, key := range keys {
-		releaseStr  += fmt.Sprintf("\n### %s\n\n", key)
-		for _, task := range r.Sections[Category(key)]{
-			releaseStr  += fmt.Sprintf(task.String())
-			releaseStr  += fmt.Sprintln()
+		releaseStr += fmt.Sprintf("\n### %s\n\n", key)
+		for _, task := range r.Sections[Category(key)] {
+			releaseStr += fmt.Sprintf(task.String())
+			releaseStr += fmt.Sprintln()
 		}
 	}
 	return releaseStr
@@ -73,6 +72,3 @@ func reverseAny(s interface{}) {
 		swap(i, j)
 	}
 }
-
-
-
