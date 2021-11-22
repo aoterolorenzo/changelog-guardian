@@ -3,10 +3,10 @@ package services
 import (
 	"bufio"
 	"bytes"
+	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	models2 "gitlab.com/aoterocom/changelog-guardian/application/models"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"regexp"
 	"strings"
 )
@@ -16,18 +16,18 @@ const releaseRegexp = `## \[(?P<releaseVersion>[^\]]+)]( - (?P<releaseDate>[0-9]
 const releaseLinkRegexp = `\[VERSION]: (?P<releaseLink>.*)`
 const categoryRegexp = `### (?P<category>.*)`
 
-func ParseChangelog(pathToChangelog string) *models2.Changelog {
+func ParseChangelog(pathToChangelog string) (*models2.Changelog, error) {
 	c := models2.NewEmptyChangelog()
 	changelogReader, err := os.Open(pathToChangelog)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	var currentCategory models2.Category
 
 	fullChangelog, err := ioutil.ReadFile(pathToChangelog)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	changelogReader, err = os.Open(pathToChangelog)
@@ -37,9 +37,9 @@ func ParseChangelog(pathToChangelog string) *models2.Changelog {
 		if bytes.HasPrefix([]byte(line), []byte("## ")) {
 			release := models2.NewEmptyRelease()
 			release = ParseRelease(line, string(fullChangelog))
-			reverseAny(c.Releases)
+			helpers.ReverseAny(c.Releases)
 			c.Releases = append(c.Releases, *release)
-			reverseAny(c.Releases)
+			helpers.ReverseAny(c.Releases)
 		}
 
 		if bytes.HasPrefix([]byte(line), []byte("### ")) {
@@ -52,8 +52,8 @@ func ParseChangelog(pathToChangelog string) *models2.Changelog {
 			c.Releases[0].Sections[currentCategory] = append(c.Releases[0].Sections[currentCategory], *task)
 		}
 	}
-	reverseAny(c.Releases)
-	return c
+	helpers.ReverseAny(c.Releases)
+	return c, nil
 }
 
 func ParseTask(line string) *models2.Task {
@@ -67,6 +67,7 @@ func ParseTask(line string) *models2.Task {
 			paramsMap[name] = match[i]
 		}
 	}
+	t.ID = paramsMap["taskName"]
 	t.Name = paramsMap["taskName"]
 	t.Href = paramsMap["taskHref"]
 	t.Title = strings.TrimSpace(strings.ReplaceAll(paramsMap["taskTitle"], "([", ""))
@@ -115,12 +116,4 @@ func ParseCategory(line string) models2.Category {
 		}
 	}
 	return models2.Category(paramsMap["category"])
-}
-
-func reverseAny(s interface{}) {
-	n := reflect.ValueOf(s).Len()
-	swap := reflect.Swapper(s)
-	for i, j := 0, n-1; i < j; i, j = i+1, j-1 {
-		swap(i, j)
-	}
 }

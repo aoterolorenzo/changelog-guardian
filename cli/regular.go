@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"gitlab.com/aoterocom/changelog-guardian/application/usecases"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -11,25 +12,27 @@ import (
 
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+// regularCmd represents the base command when called without any subcommands
+var regularCmd = &cobra.Command{
 	Use:   "Changelog Guardian",
 	Short: "Keep you're changelog safe",
 	Long:  `Keep you're changelog safe and punish those who dare to manually edit it`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {},
+	Run: func(cmd *cobra.Command, args []string) {
+		usecases.Regular()
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// This is called by main.main(). It only needs to happen once to the regularCmd.
 func Execute() {
-	cobra.CheckErr(rootCmd.Execute())
+	cobra.CheckErr(regularCmd.Execute())
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.clg.yml)")
+	regularCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.clg.yml)")
 }
 
 // initConfig reads in config file and ENV variables if set.

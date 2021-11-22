@@ -20,6 +20,5 @@ import (
 )
 
 func main() {
-
 	cli.Execute()
 }

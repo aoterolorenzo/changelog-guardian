@@ -2,11 +2,8 @@ package models
 
 import (
 	"fmt"
+	"os"
 )
-
-const changelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
-	"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
-	"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
 type Changelog struct {
 	Releases []Release
@@ -21,6 +18,10 @@ func NewEmptyChangelog() *Changelog {
 }
 
 func (c *Changelog) String() string {
+	const changelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
+		"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
+		"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
+
 	changelogStr := changelogHeader
 	changelogStr += "\n"
 	for _, release := range c.Releases {
@@ -38,4 +39,23 @@ func (c *Changelog) String() string {
 		changelogStr += "\n"
 	}
 	return changelogStr
+}
+
+func (c *Changelog) Save(filePath string) error {
+
+	f, err := os.Create(filePath)
+
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	_, err = f.WriteString(c.String())
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

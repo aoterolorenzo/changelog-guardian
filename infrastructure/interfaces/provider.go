@@ -1,11 +1,14 @@
 package interfaces
 
 import (
-	models2 "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
+	application "gitlab.com/aoterocom/changelog-guardian/application/models"
+	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"time"
 )
 
 type Provider interface {
-	GetReleases() ([]*models2.Release, error)
-	GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]models2.Task, error)
+	GetReleases(repo *string) (*[]infrastructure.Release, error)
+	GetTasks(from *time.Time, to *time.Time, repo *string, targetBranch string) (*[]infrastructure.Task, error)
+	DefineCategory(task infrastructure.Task) application.Category
+	ReleaseURL(repo string, from *string, to string) string
 }

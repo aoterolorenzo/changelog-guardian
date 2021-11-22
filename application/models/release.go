@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"reflect"
 	"sort"
 	"strings"
 )
@@ -16,6 +15,9 @@ type Release struct {
 }
 
 func NewRelease(version string, date string, link string, yanked bool, sections map[Category][]Task) *Release {
+	if sections == nil {
+		sections = make(map[Category][]Task)
+	}
 	return &Release{
 		Version:  version,
 		Date:     date,
@@ -63,12 +65,4 @@ func (r *Release) String() string {
 		}
 	}
 	return releaseStr
-}
-
-func reverseAny(s interface{}) {
-	n := reflect.ValueOf(s).Len()
-	swap := reflect.Swapper(s)
-	for i, j := 0, n-1; i < j; i, j = i+1, j-1 {
-		swap(i, j)
-	}
 }
