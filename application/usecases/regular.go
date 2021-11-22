@@ -7,7 +7,6 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
-	controllerInterfaces "gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
 )
 
 func Regular() {
@@ -21,7 +20,11 @@ func Regular() {
 	if err != nil {
 		panic(err)
 	}
-	cgController := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, []controllerInterfaces.Middleware{})
+
+	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleaseFilters, Settings.TaskFilters)
+	if err != nil {
+		panic(err)
+	}
 
 	localChangelog, err := services.ParseChangelog(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
