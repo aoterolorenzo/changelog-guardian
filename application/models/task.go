@@ -34,7 +34,7 @@ func NewEmptyTask() *Task {
 func (t *Task) String() string {
 	var authorString string
 	if t.Author != "" {
-		authorString = fmt.Sprintf(" ([@%s](%s))", t.Author, t.AuthorHref)
+		authorString = fmt.Sprintf(" ([%s](%s))", t.Author, t.AuthorHref)
 	}
 	return fmt.Sprintf("- [%s](%s) %s%s", t.Name, t.Href, t.Title, authorString)
 }

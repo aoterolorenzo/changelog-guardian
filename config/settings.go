@@ -26,6 +26,8 @@ type GlobalSettings struct {
 			Labels map[models.Category]string `yaml:"labels"`
 		} `yaml:"gitlab"`
 	} `yaml:"providers"`
+	ReleaseProvider string `yaml:"releaseProvider"`
+	TasksProvider   string `yaml:"tasksProvider"`
 }
 
 func init() {
@@ -37,7 +39,7 @@ func init() {
 	fmt.Println("Retrieving settings from " + Settings.CGConfigPath + "...")
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
 	if err != nil {
-		log.Printf("Unable to open "+Settings.CGConfigPath+": ", err)
+		fmt.Printf(Settings.CGConfigPath + " not available. Skipping...")
 	} else {
 		if err := extractSettings(string(yamlFile)); err != nil {
 			log.Panicln(err)

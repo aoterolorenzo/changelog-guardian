@@ -46,7 +46,7 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 		from1 = nil
 	}
 
-	releases, err := cgc.releaseProvider.GetReleases(from1, nil, &currentGitBAseUrl)
+	releases, err := cgc.releaseProvider.GetReleases(from1, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 		}
 
 		// Obtain the tasks between the last release to this one (or to now)
-		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, &currentGitBAseUrl, mainBranch)
+		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, mainBranch)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +132,7 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 		releaseUrl = cgc.releaseProvider.ReleaseURL(currentGitBAseUrl, nil, defaultBranch)
 	}
 
-	unreleasedTasks, _ := cgc.taskProvider.GetTasks(from, nil, &currentGitBAseUrl, defaultBranch)
+	unreleasedTasks, _ := cgc.taskProvider.GetTasks(from, nil, defaultBranch)
 	unreleasedRelease := models.NewRelease("UNRELEASED", "",
 		releaseUrl, false, nil)
 	for _, task := range *unreleasedTasks {
@@ -143,5 +143,6 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 
 	appTruncatedReleases = append(appTruncatedReleases, *unreleasedRelease)
 
+	helpers.ReverseAny(appTruncatedReleases)
 	return &appTruncatedReleases, nil
 }

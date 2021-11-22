@@ -3,29 +3,29 @@ package providers
 import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	application "gitlab.com/aoterocom/changelog-guardian/application/models"
 	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"os"
+	"strings"
 	"time"
 )
 
 type GitProvider struct {
 }
 
-func NewGitController() *GitProvider {
+func NewGitProvider() *GitProvider {
 	return &GitProvider{}
 }
 
-func (gc *GitProvider) GetReleases(from *time.Time, to *time.Time, repo *string) (*[]infrastructure.Release, error) {
+func (gc *GitProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastructure.Release, error) {
 
 	var path string
 	var err error
-	if repo == nil {
-		path, err = os.Getwd()
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		path = *repo
+
+	path, err = os.Getwd()
+	if err != nil {
+		return nil, err
 	}
 
 	r, err := git.PlainOpen(path)
@@ -63,7 +63,73 @@ func (gc *GitProvider) GetReleases(from *time.Time, to *time.Time, repo *string)
 	return &tags, nil
 }
 
-func (gc *GitProvider) GetTasks(from *time.Time, to *time.Time, repo *string, targetBranch string) (*[]infrastructure.Task, error) {
-	//TODO: Implement GetTasks method
-	return nil, nil
+func (gc *GitProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
+	var path string
+	var err error
+
+	path, err = os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return nil, err
+	}
+
+	w, err := r.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.ReferenceName(targetBranch),
+	})
+
+	opts := &git.LogOptions{
+		Since: from,
+		Until: to,
+	}
+
+	log, err := r.Log(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	var gitTasks []infrastructure.Task
+	var resultFiles []string
+	err = log.ForEach(func(commit *object.Commit) error {
+		files, err := commit.Files()
+		if err != nil {
+			return err
+		}
+
+		err = files.ForEach(func(file *object.File) error {
+			resultFiles = append(resultFiles, file.Name)
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+
+		gitTask := infrastructure.NewTask(commit.Hash.String()[:6], commit.Hash.String()[:6], strings.Split(commit.Message, "\n")[0], commit.Hash.String(), commit.Author.Name,
+			"mailto:"+commit.Author.Email, nil, resultFiles)
+		gitTask.Category = gc.DefineCategory(*gitTask)
+		gitTasks = append(gitTasks, *gitTask)
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &gitTasks, nil
+}
+
+func (gc *GitProvider) DefineCategory(task infrastructure.Task) application.Category {
+	return application.ADDED
+}
+
+func (gc *GitProvider) ReleaseURL(repo string, from *string, to string) string {
+	return "\"\""
 }
