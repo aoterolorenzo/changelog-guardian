@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/go-git/go-git/v5"
 	"github.com/joho/godotenv"
 	"github.com/xanzy/go-gitlab"
 	application "gitlab.com/aoterocom/changelog-guardian/application/models"
@@ -27,8 +28,19 @@ func NewGitlabProvider() *GitlabProvider {
 	}
 }
 
-func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time, repo *string) (*[]infrastructure.Release, error) {
-	gitlabProjectWebUrl := strings.Replace(*repo, ".git", "", 1)
+func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastructure.Release, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	r, err := git.PlainOpen(cwd)
+	if err != nil {
+		return nil, err
+	}
+	remotes, _ := r.Remotes()
+	currentGitBAseUrl := remotes[0].Config().URLs[0]
+
+	gitlabProjectWebUrl := strings.Replace(currentGitBAseUrl, ".git", "", 1)
 	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
@@ -66,10 +78,19 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time, repo *stri
 	return &gitReleases, nil
 }
 
-func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, repo *string, targetBranch string) (*[]infrastructure.Task, error) {
+func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	r, err := git.PlainOpen(cwd)
+	if err != nil {
+		return nil, err
+	}
+	remotes, _ := r.Remotes()
+	currentGitBAseUrl := remotes[0].Config().URLs[0]
 
-	currentGitBAseUrl := repo
-	gitlabProjectName := strings.Replace(*currentGitBAseUrl, "https://gitlab.com/", "", 1)
+	gitlabProjectName := strings.Replace(currentGitBAseUrl, "https://gitlab.com/", "", 1)
 	gitlabProjectName = strings.Replace(gitlabProjectName, ".git", "", 1)
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
@@ -113,7 +134,7 @@ func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, repo *string,
 		for _, change := range mergeRequest.Changes {
 			fileChanges = append(fileChanges, change.NewPath)
 		}
-		gitTask := infrastructure.NewTask("!"+strconv.Itoa(mergeRequest.IID), "!"+strconv.Itoa(mergeRequest.IID), mergeRequest.Title, mergeRequest.WebURL, mergeRequest.Author.Username,
+		gitTask := infrastructure.NewTask("!"+strconv.Itoa(mergeRequest.IID), "!"+strconv.Itoa(mergeRequest.IID), mergeRequest.Title, mergeRequest.WebURL, "@"+mergeRequest.Author.Username,
 			mergeRequest.Author.WebURL, labelStrings, fileChanges)
 		gitTask.Category = gp.DefineCategory(*gitTask)
 		gitTasks = append(gitTasks, *gitTask)

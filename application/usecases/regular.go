@@ -8,16 +8,20 @@ import (
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
 	controllerInterfaces "gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
-	"gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
-	"gitlab.com/aoterocom/changelog-guardian/infrastructure/providers"
 )
 
 func Regular() {
 
-	releaseProvider := interfaces.Provider(providers.NewGitlabProvider())
-	tasksProvider := interfaces.Provider(providers.NewGitlabProvider())
+	releaseProvider, err := services.ProviderSelector(Settings.ReleaseProvider)
+	if err != nil {
+		panic(err)
+	}
 
-	cgController := controllers.NewChangelogGuardianController(releaseProvider, tasksProvider, []controllerInterfaces.Middleware{})
+	tasksProvider, err := services.ProviderSelector(Settings.TasksProvider)
+	if err != nil {
+		panic(err)
+	}
+	cgController := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, []controllerInterfaces.Middleware{})
 
 	localChangelog, err := services.ParseChangelog(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
@@ -35,6 +39,9 @@ func Regular() {
 	}
 
 	releases, err := cgController.CetFilledReleasesFromInfra(lastRelease, Settings.MainBranch, Settings.DevelopBranch)
+	if err != nil {
+		panic(err)
+	}
 	retrievedChangelog := models.NewChangelog(*releases)
 
 	if localChangelog != nil {

@@ -15,13 +15,5 @@ providers:
       Removed: kind::removal
       Documentation: kind::docs
       Security: kind::security
-#  git:
-#    commitRegex: ^(?<type>(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?)
-#    types:
-#      DOCUMENTATION: docs
-#      ADDED: feat
-#      FIXED: fix
-#      CHANGED: perf
-#      REFACTOR: refactor
-#    scopes:
-#      BREAKING_CHANGE: breaking
+releaseProvider: git
+tasksProvider: git
