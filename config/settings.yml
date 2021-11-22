@@ -1,6 +1,7 @@
 changelogPath: ./CHANGELOG.md
 mainBranch: main
-developBranch: develop
+defaultBranch: develop
+cgConfigPath: .cg-config.yml
 providers:
   gitlab:
     labels:
