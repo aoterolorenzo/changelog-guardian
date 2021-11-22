@@ -36,7 +36,17 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 	remotes, _ := r.Remotes()
 	currentGitBAseUrl := remotes[0].Config().URLs[0]
 
-	releases, err := cgc.releaseProvider.GetReleases(&currentGitBAseUrl)
+	var from1 *time.Time
+	if lastRelease != nil {
+		layout := "2006-01-02T15:04:05"
+		str := lastRelease.Date + "T00:00:00"
+		t, _ := time.Parse(layout, str)
+		from1 = &t
+	} else {
+		from1 = nil
+	}
+
+	releases, err := cgc.releaseProvider.GetReleases(from1, nil, &currentGitBAseUrl)
 	if err != nil {
 		return nil, err
 	}
