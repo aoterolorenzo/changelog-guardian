@@ -15,7 +15,7 @@ func NewGitController() *GitProvider {
 	return &GitProvider{}
 }
 
-func (gc *GitProvider) GetReleases(repo *string) (*[]infrastructure.Release, error) {
+func (gc *GitProvider) GetReleases(from *time.Time, to *time.Time, repo *string) (*[]infrastructure.Release, error) {
 
 	var path string
 	var err error

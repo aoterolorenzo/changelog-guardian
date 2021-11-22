@@ -27,7 +27,7 @@ func NewGitlabProvider() *GitlabProvider {
 	}
 }
 
-func (gp *GitlabProvider) GetReleases(repo *string) (*[]infrastructure.Release, error) {
+func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time, repo *string) (*[]infrastructure.Release, error) {
 	gitlabProjectWebUrl := strings.Replace(*repo, ".git", "", 1)
 	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
 
