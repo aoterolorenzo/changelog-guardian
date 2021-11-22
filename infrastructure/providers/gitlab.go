@@ -192,6 +192,6 @@ func (gp *GitlabProvider) ReleaseURL(repo string, from *string, to string) strin
 	if from != nil {
 		return "https://gitlab.com/" + gitlabProjectName + "/-/compare/" + *from + "..." + to
 	}
-	return "https://gitlab.com/maxigaz/gitlab-dark/-/merge_requests?scope=all&state=merged&target_branch=" + to
+	return "https://gitlab.com/" + gitlabProjectName + "/-/merge_requests?scope=all&state=merged&target_branch=" + to
 
 }
