@@ -17,3 +17,5 @@ providers:
       Security: kind::security
 releaseProvider: git
 tasksProvider: git
+releaseFilters: [ 'semver' ]
+taskFilters: []

@@ -26,8 +26,10 @@ type GlobalSettings struct {
 			Labels map[models.Category]string `yaml:"labels"`
 		} `yaml:"gitlab"`
 	} `yaml:"providers"`
-	ReleaseProvider string `yaml:"releaseProvider"`
-	TasksProvider   string `yaml:"tasksProvider"`
+	ReleaseProvider string   `yaml:"releaseProvider"`
+	TasksProvider   string   `yaml:"tasksProvider"`
+	ReleaseFilters  []string `yaml:"releaseFilters"`
+	TaskFilters     []string `yaml:"taskFilters"`
 }
 
 func init() {

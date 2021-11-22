@@ -1,8 +1,7 @@
-package test
+package providers
 
 import (
 	"fmt"
-	"gitlab.com/aoterocom/changelog-guardian/infrastructure/providers"
 	"reflect"
 	"testing"
 	"time"
@@ -37,8 +36,8 @@ func TestGitlabProvider_GetReleases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			glc := providers.NewGitlabProvider()
-			got, err := glc.GetReleases(nil, nil, tt.args.repo)
+			glc := NewGitlabProvider()
+			got, err := glc.GetReleases(nil, nil)
 			if (err != nil) && tt.wantErr {
 				return
 			}
@@ -90,8 +89,8 @@ func TestGitlabProvider_GetTasks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			glc := providers.NewGitlabProvider()
-			got, err := glc.GetTasks(tt.args.from, tt.args.to, tt.args.repo, tt.args.targetBranch)
+			glc := NewGitlabProvider()
+			got, err := glc.GetTasks(tt.args.from, tt.args.to, tt.args.targetBranch)
 			if (err != nil) && tt.wantErr {
 				return
 			}
