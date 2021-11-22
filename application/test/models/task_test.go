@@ -21,7 +21,10 @@ func TestTask(t *testing.T) {
 func TestChangelogParsing(t *testing.T) {
 
 	pathToChangelog := "/Users/alberto/GolandProyects/CLogger/test/models/resources/CHANGELOG.md"
-	changelog := services.ParseChangelog(pathToChangelog)
+	changelog, err := services.ParseChangelog(pathToChangelog)
+	if err != nil {
+		panic(err)
+	}
 	fullChangelog, err := ioutil.ReadFile(pathToChangelog)
 	if err != nil {
 		panic(err)

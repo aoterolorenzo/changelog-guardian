@@ -1,0 +1,26 @@
+changelogPath: ./CHANGELOG.md
+mainBranch: main
+developBranch: develop
+providers:
+  gitlab:
+    labels:
+      Breaking Change: kind::breaking
+      Added: kind::feature
+      Changed: kind::perf
+      Refactor: kind::refactor
+      Fixed: kind::fix
+      Dependencies: kind::dependencies
+      Deprecated: kind::deprecation
+      Removed: kind::removal
+      Documentation: kind::docs
+      Security: kind::security
+#  git:
+#    commitRegex: ^(?<type>(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?)
+#    types:
+#      DOCUMENTATION: docs
+#      ADDED: feat
+#      FIXED: fix
+#      CHANGED: perf
+#      REFACTOR: refactor
+#    scopes:
+#      BREAKING_CHANGE: breaking
