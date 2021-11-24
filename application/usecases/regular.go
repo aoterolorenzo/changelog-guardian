@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
@@ -11,12 +12,17 @@ import (
 
 func RegularCmd() *models.Changelog {
 
-	releaseProvider, err := services.ProviderSelector(Settings.ReleaseProvider)
+	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
 	if err != nil {
 		panic(err)
 	}
 
-	tasksProvider, err := services.ProviderSelector(Settings.TasksProvider)
+	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
+	if err != nil {
+		panic(err)
+	}
+
+	tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +32,7 @@ func RegularCmd() *models.Changelog {
 		panic(err)
 	}
 
-	localChangelog, err := services.ParseChangelog(Settings.ChangelogPath)
+	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
 		panic(err)
 	}
@@ -45,7 +51,8 @@ func RegularCmd() *models.Changelog {
 	if err != nil {
 		panic(err)
 	}
-	retrievedChangelog := models.NewChangelog(*releases)
+	retrievedChangelog := models.NewChangelog()
+	retrievedChangelog.Releases = *releases
 
 	if localChangelog != nil {
 		changelogMixer := services.NewChangelogMixer()
@@ -57,7 +64,9 @@ func RegularCmd() *models.Changelog {
 			localChangelogExceptUnreleased := localChangelog.Releases[:len(localChangelog.Releases)-1]
 			for sec, sectionTasks := range retrievedUnreleased.Sections {
 				for i, task := range sectionTasks {
-					_, _, exists := changelogMixer.ChangelogContainsTask(*models.NewChangelog(localChangelogExceptUnreleased), task)
+					provChangelog := *models.NewChangelog()
+					provChangelog.Releases = localChangelogExceptUnreleased
+					_, _, exists := changelogMixer.ChangelogContainsTask(provChangelog, task)
 					if exists {
 						retrievedUnreleased.Sections[sec] = remove(sectionTasks, i)
 					}
@@ -70,7 +79,7 @@ func RegularCmd() *models.Changelog {
 		retrievedChangelog = &mergedChangelog
 	}
 
-	err = retrievedChangelog.Save(Settings.ChangelogPath)
+	err = (*changelogService).SaveChangelog(*retrievedChangelog, Settings.ChangelogPath)
 	if err != nil {
 		panic(err)
 	}

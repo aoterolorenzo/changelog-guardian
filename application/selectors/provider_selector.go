@@ -1,4 +1,4 @@
-package services
+package selectors
 
 import (
 	"github.com/pkg/errors"

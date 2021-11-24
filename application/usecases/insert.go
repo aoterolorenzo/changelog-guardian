@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
@@ -28,9 +29,14 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 		fmt.Println("--id argument is mandatory")
 	}
 
+	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
+	if err != nil {
+		panic(err)
+	}
+
 	var taskFromProvider = &models.Task{}
 	if !argSkipAutocompletion {
-		tasksProvider, err := services.ProviderSelector(Settings.TasksProvider)
+		tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
 		if err != nil {
 			panic(err)
 		}
@@ -47,7 +53,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 
 	}
 
-	localChangelog, err := services.ParseChangelog(Settings.ChangelogPath)
+	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
 		panic(err)
 	}
@@ -71,7 +77,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = localChangelog.Save(Settings.ChangelogPath)
+	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
 		fmt.Println(err)
 		return
