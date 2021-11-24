@@ -45,39 +45,49 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 		nextVersion = semVer.CalculateNextVersion(categories, versionToBump)
 
+		if !argForce {
+			if argPatch {
+				checkVersion := semVer.BumpPatch(versionToBump)
+				if nextVersion != checkVersion {
+					fmt.Println("Cannot release a patch version: current tasks imply a minor/major version bump.")
+					return
+				}
+			}
+			if argMinor {
+				checkVersion := semVer.BumpMinor(versionToBump)
+				if nextVersion != checkVersion {
+					fmt.Println("Cannot release a minor version: no current tasks implying a minor version " +
+						"or at least implying breaking changes")
+					return
+				}
+			}
+			if argMajor {
+				checkVersion := semVer.BumpMinor(versionToBump)
+				if nextVersion != checkVersion {
+					fmt.Println("Cannot release a major version: no breaking changes found")
+					return
+				}
+			}
+			if argVersion != "" {
+				if nextVersion != argVersion {
+					fmt.Println("Version breaks semver: current version expected would be " + nextVersion)
+					return
+				}
+			}
+		} else {
+			if argPatch {
+				nextVersion = semVer.BumpPatch(versionToBump)
+			}
+			if argMinor {
+				nextVersion = semVer.BumpMinor(versionToBump)
+			}
+			if argMajor {
+				nextVersion = semVer.BumpMajor(versionToBump)
+			}
+		}
+
 	} else {
 		nextVersion = Settings.InitialVersion
-	}
-
-	if !argForce {
-		if argPatch {
-			checkVersion := semVer.BumpPatch(versionToBump)
-			if nextVersion != checkVersion {
-				fmt.Println("Cannot release a patch version: current tasks imply a minor/major version bump.")
-				return
-			}
-		}
-		if argMinor {
-			checkVersion := semVer.BumpMinor(versionToBump)
-			if nextVersion != checkVersion {
-				fmt.Println("Cannot release a minor version: no current tasks implying a minor version " +
-					"or at least implying breaking changes")
-				return
-			}
-		}
-		if argMajor {
-			checkVersion := semVer.BumpMinor(versionToBump)
-			if nextVersion != checkVersion {
-				fmt.Println("Cannot release a major version: no breaking changes found")
-				return
-			}
-		}
-		if argVersion != "" {
-			if nextVersion != argVersion {
-				fmt.Println("Version breaks semver: current version expected would be " + nextVersion)
-				return
-			}
-		}
 	}
 
 	// Add pre-release and build strings if provided
