@@ -6,11 +6,11 @@ style: markdown
 providers:
   gitlab:
     labels:
-      Breaking Change: kind::breaking
+      Breaking Changes: kind::breaking
       Added: kind::feature
       Changed: kind::perf
       Refactor: kind::refactor
-      Fixed: kind::fix
+      Fixed: kind::bugfix
       Dependencies: kind::dependencies
       Deprecated: kind::deprecation
       Removed: kind::removal
