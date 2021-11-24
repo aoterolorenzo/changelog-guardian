@@ -94,7 +94,9 @@ func ParseRelease(line string, fullChangelog string) *models2.Release {
 		r.Yanked = true
 	}
 
-	rg = regexp.MustCompile(strings.Replace(releaseLinkRegexp, "VERSION", r.Version, 1))
+	m := regexp.MustCompile("(\\\\|\\^|\\.|\\||\\?|\\*|\\+|\\{|\\}|\\(|\\)|\\[|\\])")
+	escapedVersion := m.ReplaceAllString(r.Version, "\\$1")
+	rg = regexp.MustCompile(strings.Replace(releaseLinkRegexp, "VERSION", escapedVersion, 1))
 	match = rg.FindStringSubmatch(fullChangelog)
 	paramsMap = make(map[string]string)
 	for i, name := range rg.SubexpNames() {

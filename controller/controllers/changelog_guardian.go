@@ -203,6 +203,21 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	return &appTruncatedReleases, nil
 }
 
+func (cgc *ChangelogGuardianController) GetTask(taskId string) (*models.Task, error) {
+	task, err := cgc.taskProvider.GetTask(taskId)
+	if err != nil {
+		return nil, err
+	}
+
+	taskFromProvider := cgc.throughTaskFilters([]infra.Task{*task})
+
+	if len(taskFromProvider) != 0 {
+		return services.NewModelMapperService().InfraTaskToApplicationModel(taskFromProvider[0]), nil
+	} else {
+		return &models.Task{}, nil
+	}
+}
+
 func (cgc *ChangelogGuardianController) throughReleaseFilters(releases []infra.Release) []infra.Release {
 	// Reverse to start from the first item
 	helpers.ReverseAny(cgc.releaseFilters)
