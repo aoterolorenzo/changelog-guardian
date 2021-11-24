@@ -17,15 +17,12 @@ var regularCmd = &cobra.Command{
 	Use:   "Changelog Guardian",
 	Short: "Keep you're changelog safe",
 	Long:  `Keep you're changelog safe and punish those who dare to manually edit it`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+
 	Run: func(cmd *cobra.Command, args []string) {
-		usecases.Regular()
+		usecases.RegularCmd()
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the regularCmd.
 func Execute() {
 	cobra.CheckErr(regularCmd.Execute())
 }
@@ -35,7 +32,6 @@ func init() {
 	regularCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.clg.yml)")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.

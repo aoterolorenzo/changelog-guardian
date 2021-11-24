@@ -30,6 +30,7 @@ type GlobalSettings struct {
 	TasksProvider   string   `yaml:"tasksProvider"`
 	ReleaseFilters  []string `yaml:"releaseFilters"`
 	TaskFilters     []string `yaml:"taskFilters"`
+	InitialVersion  string   `yaml:"initialVersion"`
 }
 
 func init() {

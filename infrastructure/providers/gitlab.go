@@ -29,18 +29,12 @@ func NewGitlabProvider() *GitlabProvider {
 }
 
 func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastructure.Release, error) {
-	cwd, err := os.Getwd()
+	currentGitBAseUrl, err := gp.repoURL()
 	if err != nil {
 		return nil, err
 	}
-	r, err := git.PlainOpen(cwd)
-	if err != nil {
-		return nil, err
-	}
-	remotes, _ := r.Remotes()
-	currentGitBAseUrl := remotes[0].Config().URLs[0]
 
-	gitlabProjectWebUrl := strings.Replace(currentGitBAseUrl, ".git", "", 1)
+	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
 	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
@@ -79,18 +73,12 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 }
 
 func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
-	cwd, err := os.Getwd()
+	currentGitBAseUrl, err := gp.repoURL()
 	if err != nil {
 		return nil, err
 	}
-	r, err := git.PlainOpen(cwd)
-	if err != nil {
-		return nil, err
-	}
-	remotes, _ := r.Remotes()
-	currentGitBAseUrl := remotes[0].Config().URLs[0]
 
-	gitlabProjectName := strings.Replace(currentGitBAseUrl, "https://gitlab.com/", "", 1)
+	gitlabProjectName := strings.Replace(*currentGitBAseUrl, "https://gitlab.com/", "", 1)
 	gitlabProjectName = strings.Replace(gitlabProjectName, ".git", "", 1)
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
@@ -186,12 +174,31 @@ func (gp *GitlabProvider) DefineCategory(task infrastructure.Task) application.C
 	return category
 }
 
-func (gp *GitlabProvider) ReleaseURL(repo string, from *string, to string) string {
-	gitlabProjectName := strings.Replace(repo, "https://gitlab.com/", "", 1)
+func (gp *GitlabProvider) ReleaseURL(from *string, to string) (*string, error) {
+	repo, err := gp.repoURL()
+	if err != nil {
+		return nil, err
+	}
+	gitlabProjectName := strings.Replace(*repo, "https://gitlab.com/", "", 1)
 	gitlabProjectName = strings.Replace(gitlabProjectName, ".git", "", 1)
 	if from != nil {
-		return "https://gitlab.com/" + gitlabProjectName + "/-/compare/" + *from + "..." + to
+		url := "https://gitlab.com/" + gitlabProjectName + "/-/compare/" + *from + "..." + to
+		return &url, nil
 	}
-	return "https://gitlab.com/" + gitlabProjectName + "/-/merge_requests?scope=all&state=merged&target_branch=" + to
 
+	url := "https://gitlab.com/" + gitlabProjectName + "/-/merge_requests?scope=all&state=merged&target_branch=" + to
+	return &url, nil
+}
+
+func (gp *GitlabProvider) repoURL() (*string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	r, err := git.PlainOpen(cwd)
+	if err != nil {
+		return nil, err
+	}
+	remotes, _ := r.Remotes()
+	return &remotes[0].Config().URLs[0], nil
 }
