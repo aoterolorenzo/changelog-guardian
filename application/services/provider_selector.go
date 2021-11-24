@@ -12,7 +12,7 @@ func ProviderSelector(providerStr string) (*interfaces.Provider, error) {
 		prov := interfaces.Provider(providers.NewGitProvider())
 		return &prov, nil
 	case "gitlab":
-		prov := interfaces.Provider(providers.NewGitlabProvider())
+		prov := interfaces.Provider(providers.NewGitlabProvider(nil))
 		return &prov, nil
 	default:
 		return nil, errors.Errorf("unknown provider " + providerStr)

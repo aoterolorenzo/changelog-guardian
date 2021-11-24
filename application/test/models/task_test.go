@@ -6,6 +6,7 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -19,8 +20,8 @@ func TestTask(t *testing.T) {
 }
 
 func TestChangelogParsing(t *testing.T) {
-
-	pathToChangelog := "/Users/alberto/GolandProyects/CLogger/test/models/resources/CHANGELOG.md"
+	cwd, _ := os.Getwd()
+	pathToChangelog := cwd + "/" + "resources/CHANGELOG.md"
 	changelog, err := services.ParseChangelog(pathToChangelog)
 	if err != nil {
 		panic(err)
