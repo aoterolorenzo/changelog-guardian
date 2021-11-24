@@ -28,8 +28,8 @@ type GlobalSettings struct {
 	} `yaml:"providers"`
 	ReleaseProvider string   `yaml:"releaseProvider"`
 	TasksProvider   string   `yaml:"tasksProvider"`
-	ReleaseFilters  []string `yaml:"releaseFilters"`
-	TaskFilters     []string `yaml:"taskFilters"`
+	ReleasePipes    []string `yaml:"releasePipes"`
+	TaskPipes       []string `yaml:"taskPipes"`
 	InitialVersion  string   `yaml:"initialVersion"`
 	Style           string   `yaml:"style"`
 }
