@@ -51,11 +51,14 @@ func (cm *ChangelogMixer) MergeChangelogs(changelog1 models.Changelog, changelog
 func (cm *ChangelogMixer) MergeReleases(release1 models.Release, release2 models.Release) *models.Release {
 
 	for category, section := range release1.Sections {
+		helpers.ReverseAny(section)
 		for _, task := range section {
 			// If task in both releases, we remove the one on release1, and we take the one in release2
 			_, _, release2containsTask := cm.ReleaseContainsTask(release2, task)
 			if !release2containsTask {
+				helpers.ReverseAny(release2.Sections[category])
 				release2.Sections[category] = append(release2.Sections[category], task)
+				helpers.ReverseAny(release2.Sections[category])
 			}
 
 		}
