@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"strconv"
@@ -28,6 +29,11 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	var nextVersion string
 	var lastRelease *models.Release
 	semVer := services.NewSemVerService()
+
+	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
+	if err != nil {
+		panic(err)
+	}
 
 	if argForce && argVersion != "" {
 		nextVersion = argVersion
@@ -108,7 +114,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	unreleased := &changelog.Releases[0]
 	unreleased.Version = nextVersion
 
-	releaseProvider, err := services.ProviderSelector(Settings.ReleaseProvider)
+	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +138,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	changelog.Releases = append(changelog.Releases, *models.NewRelease("UNRELEASED", "", *newUnreleasedURL, false, nil))
 	helpers.ReverseAny(changelog.Releases)
 
-	err = changelog.Save(Settings.ChangelogPath)
+	err = (*changelogService).SaveChangelog(*changelog, Settings.ChangelogPath)
 	if err != nil {
 		panic(err)
 	}

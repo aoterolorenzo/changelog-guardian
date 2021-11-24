@@ -31,6 +31,7 @@ type GlobalSettings struct {
 	ReleaseFilters  []string `yaml:"releaseFilters"`
 	TaskFilters     []string `yaml:"taskFilters"`
 	InitialVersion  string   `yaml:"initialVersion"`
+	Style           string   `yaml:"style"`
 }
 
 func init() {

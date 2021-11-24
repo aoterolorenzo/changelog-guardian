@@ -1,10 +1,9 @@
-package models
+package themes
 
 import (
 	"fmt"
 	"github.com/magiconair/properties/assert"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
-	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -14,22 +13,28 @@ const OkTask = "- [TASK1](https://gitlab.com/aoterocom/changelog-guardian/issues
 
 func TestTask(t *testing.T) {
 	task := models.NewEmptyTask()
-	task = services.ParseTask(OkTask)
+
+	changelogService := MarkDownChangelogService{}
+	parsedTaskPtr := changelogService.parseTask(OkTask, "")
+	task = &parsedTaskPtr
 	fmt.Println(task)
 	assert.Equal(t, task.String(), OkTask)
 }
 
 func TestChangelogParsing(t *testing.T) {
 	cwd, _ := os.Getwd()
+	changelogService := MarkDownChangelogService{}
 	pathToChangelog := cwd + "/" + "resources/CHANGELOG.md"
-	changelog, err := services.ParseChangelog(pathToChangelog)
+
+	changelog, err := changelogService.Parse(pathToChangelog)
 	if err != nil {
 		panic(err)
 	}
+
 	fullChangelog, err := ioutil.ReadFile(pathToChangelog)
 	if err != nil {
 		panic(err)
 	}
 
-	assert.Equal(t, changelog.String(), string(fullChangelog))
+	assert.Equal(t, changelogService.String(*changelog), string(fullChangelog))
 }

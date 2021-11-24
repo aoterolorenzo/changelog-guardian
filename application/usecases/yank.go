@@ -5,13 +5,19 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 )
 
 func YankCmd(cmd *cobra.Command, args []string) {
 
-	localChangelog, err := services.ParseChangelog(Settings.ChangelogPath)
+	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
+	if err != nil {
+		panic(err)
+	}
+
+	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
 		panic(err)
 	}
@@ -51,9 +57,8 @@ func YankCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	err = localChangelog.Save(Settings.ChangelogPath)
+	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 }
