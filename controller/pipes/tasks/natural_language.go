@@ -5,14 +5,14 @@ import (
 	"strings"
 )
 
-type NaturalLanguageTaskFilter struct {
+type NaturalLanguageTaskPipe struct {
 }
 
-func NewNaturalLanguageTaskFilter() *NaturalLanguageTaskFilter {
-	return &NaturalLanguageTaskFilter{}
+func NewNaturalLanguageTaskPipe() *NaturalLanguageTaskPipe {
+	return &NaturalLanguageTaskPipe{}
 }
 
-func (nlm *NaturalLanguageTaskFilter) Filter(task *infra.Task) (*infra.Task, bool, error) {
+func (nlm *NaturalLanguageTaskPipe) Pipe(task *infra.Task) (*infra.Task, bool, error) {
 
 	words := [][]string{
 		{"Add", "Added"},

@@ -3,29 +3,29 @@ package services
 import (
 	"github.com/pkg/errors"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
-	releaseFilters "gitlab.com/aoterocom/changelog-guardian/controller/middleware/release"
-	taskFilters "gitlab.com/aoterocom/changelog-guardian/controller/middleware/tasks"
+	releasePipes "gitlab.com/aoterocom/changelog-guardian/controller/pipes/release"
+	taskPipes "gitlab.com/aoterocom/changelog-guardian/controller/pipes/tasks"
 )
 
-func ReleaseFilterSelector(providerStr string) (*interfaces.ReleaseFilter, error) {
+func ReleasePipeSelector(providerStr string) (*interfaces.ReleasePipe, error) {
 	switch providerStr {
 	case "semver":
-		prov := interfaces.ReleaseFilter(releaseFilters.NewSemverReleaseFilter())
+		prov := interfaces.ReleasePipe(releasePipes.NewSemverReleasePipe())
 		return &prov, nil
 	default:
-		return nil, errors.Errorf("unknown release filter " + providerStr)
+		return nil, errors.Errorf("unknown release pipe " + providerStr)
 	}
 }
 
-func TaskFilterSelector(providerStr string) (*interfaces.TaskFilter, error) {
+func TaskPipeSelector(providerStr string) (*interfaces.TaskPipe, error) {
 	switch providerStr {
 	case "gitlab_resolver":
-		prov := interfaces.TaskFilter(taskFilters.NewGitlabResolverTaskFilter())
+		prov := interfaces.TaskPipe(taskPipes.NewGitlabResolverTaskPipe())
 		return &prov, nil
 	case "natural_language":
-		prov := interfaces.TaskFilter(taskFilters.NewNaturalLanguageTaskFilter())
+		prov := interfaces.TaskPipe(taskPipes.NewNaturalLanguageTaskPipe())
 		return &prov, nil
 	default:
-		return nil, errors.Errorf("unknown task filter " + providerStr)
+		return nil, errors.Errorf("unknown task pipe " + providerStr)
 	}
 }

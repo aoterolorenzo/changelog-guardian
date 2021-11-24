@@ -6,10 +6,11 @@ import (
 	"testing"
 )
 
-func TestGitlabResolverTaskFilter_Filter(t *testing.T) {
+func TestNaturalLanguageTaskPipe_Pipe(t *testing.T) {
 	type args struct {
 		task *infra.Task
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -18,14 +19,14 @@ func TestGitlabResolverTaskFilter_Filter(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "Test Gitlab Resolver filter with an accepted task",
-			args:    args{task: &infra.Task{Title: "Resolve \"Add new feature\""}},
-			want:    &infra.Task{Title: "Add new feature"},
+			name:    "Test Natural Language pipe with an accepted task",
+			args:    args{task: &infra.Task{Title: "Add new feature"}},
+			want:    &infra.Task{Title: "Added new feature"},
 			want1:   true,
 			wantErr: false,
 		},
 		{
-			name:    "Test Gitlab Resolver filter with a non accepted task",
+			name:    "Test Natural Language pipe with a non accepted task",
 			args:    args{task: &infra.Task{Title: "Rare verb new feature"}},
 			want:    &infra.Task{Title: "Rare verb new feature"},
 			want1:   false,
@@ -34,33 +35,33 @@ func TestGitlabResolverTaskFilter_Filter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tf := &GitlabResolverTaskFilter{}
-			got, got1, err := tf.Filter(tt.args.task)
+			nlm := &NaturalLanguageTaskPipe{}
+			got, got1, err := nlm.Pipe(tt.args.task)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Filter() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Pipe() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Filter() got = %v, want %v", got, tt.want)
+				t.Errorf("Pipe() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("Filter() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("Pipe() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
 }
 
-func TestNewGitlabResolverTaskFilter(t *testing.T) {
+func TestNewNaturalLanguageTaskPipe(t *testing.T) {
 	tests := []struct {
 		name string
-		want *GitlabResolverTaskFilter
+		want *NaturalLanguageTaskPipe
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewGitlabResolverTaskFilter(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewGitlabResolverTaskFilter() = %v, want %v", got, tt.want)
+			if got := NewNaturalLanguageTaskPipe(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewNaturalLanguageTaskPipe() = %v, want %v", got, tt.want)
 			}
 		})
 	}

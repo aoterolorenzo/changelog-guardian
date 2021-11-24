@@ -5,14 +5,14 @@ import (
 	"strings"
 )
 
-type GitlabResolverTaskFilter struct {
+type GitlabResolverTaskPipe struct {
 }
 
-func NewGitlabResolverTaskFilter() *GitlabResolverTaskFilter {
-	return &GitlabResolverTaskFilter{}
+func NewGitlabResolverTaskPipe() *GitlabResolverTaskPipe {
+	return &GitlabResolverTaskPipe{}
 }
 
-func (tf *GitlabResolverTaskFilter) Filter(task *infra.Task) (*infra.Task, bool, error) {
+func (tf *GitlabResolverTaskPipe) Pipe(task *infra.Task) (*infra.Task, bool, error) {
 
 	if strings.HasPrefix(task.Title, "Resolve \"") && strings.HasSuffix(task.Title, "\"") {
 		task.Title = strings.Replace(task.Title, "Resolve \"", "", 1)

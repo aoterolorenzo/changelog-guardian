@@ -27,7 +27,7 @@ func RegularCmd() *models.Changelog {
 		panic(err)
 	}
 
-	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleaseFilters, Settings.TaskFilters)
+	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleasePipes, Settings.TaskPipes)
 	if err != nil {
 		panic(err)
 	}

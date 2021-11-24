@@ -2,16 +2,16 @@ package controllers
 
 import (
 	interfaces2 "gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
-	middleware "gitlab.com/aoterocom/changelog-guardian/controller/middleware/release"
-	middleware2 "gitlab.com/aoterocom/changelog-guardian/controller/middleware/tasks"
+	middleware "gitlab.com/aoterocom/changelog-guardian/controller/pipes/release"
+	middleware2 "gitlab.com/aoterocom/changelog-guardian/controller/pipes/tasks"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"reflect"
 	"testing"
 )
 
-func TestChangelogGuardianController_throughReleaseFilters(t *testing.T) {
+func TestChangelogGuardianController_throughReleasePipes(t *testing.T) {
 	type fields struct {
-		releaseFilters []interfaces2.ReleaseFilter
+		releasePipes []interfaces2.ReleasePipe
 	}
 	type args struct {
 		releases []infra.Release
@@ -23,9 +23,9 @@ func TestChangelogGuardianController_throughReleaseFilters(t *testing.T) {
 		want   []infra.Release
 	}{
 		{
-			name: "Test release filtering",
-			fields: fields{releaseFilters: []interfaces2.ReleaseFilter{
-				interfaces2.ReleaseFilter(&middleware.SemverReleaseFilter{}),
+			name: "Test release pipeing",
+			fields: fields{releasePipes: []interfaces2.ReleasePipe{
+				interfaces2.ReleasePipe(&middleware.SemverReleasePipe{}),
 			}},
 			args: args{
 				releases: []infra.Release{
@@ -43,18 +43,18 @@ func TestChangelogGuardianController_throughReleaseFilters(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cgc := &ChangelogGuardianController{
-				releaseFilters: tt.fields.releaseFilters,
+				releasePipes: tt.fields.releasePipes,
 			}
-			if got := cgc.throughReleaseFilters(tt.args.releases); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("throughReleaseFilters() = %v, want %v", got, tt.want)
+			if got := cgc.throughReleasePipes(tt.args.releases); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("throughReleasePipes() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestChangelogGuardianController_throughTaskFilters(t *testing.T) {
+func TestChangelogGuardianController_throughTaskPipes(t *testing.T) {
 	type fields struct {
-		taskFilters []interfaces2.TaskFilter
+		taskPipes []interfaces2.TaskPipe
 	}
 	type args struct {
 		tasks []infra.Task
@@ -66,11 +66,11 @@ func TestChangelogGuardianController_throughTaskFilters(t *testing.T) {
 		want   []infra.Task
 	}{
 		{
-			name: "Test task filtering",
-			fields: fields{taskFilters: []interfaces2.TaskFilter{
+			name: "Test task pipeing",
+			fields: fields{taskPipes: []interfaces2.TaskPipe{
 				// Need to go in reverse order!!
-				interfaces2.TaskFilter(&middleware2.NaturalLanguageTaskFilter{}),
-				interfaces2.TaskFilter(&middleware2.GitlabResolverTaskFilter{}),
+				interfaces2.TaskPipe(&middleware2.NaturalLanguageTaskPipe{}),
+				interfaces2.TaskPipe(&middleware2.GitlabResolverTaskPipe{}),
 			}},
 			args: args{
 				tasks: []infra.Task{
@@ -91,10 +91,10 @@ func TestChangelogGuardianController_throughTaskFilters(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cgc := &ChangelogGuardianController{
-				taskFilters: tt.fields.taskFilters,
+				taskPipes: tt.fields.taskPipes,
 			}
-			if got := cgc.throughTaskFilters(tt.args.tasks); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("throughTaskFilters() = %v, want %v", got, tt.want)
+			if got := cgc.throughTaskPipes(tt.args.tasks); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("throughTaskPipes() = %v, want %v", got, tt.want)
 			}
 		})
 	}
