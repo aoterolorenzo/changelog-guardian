@@ -9,7 +9,7 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
 )
 
-func Regular() {
+func RegularCmd() *models.Changelog {
 
 	releaseProvider, err := services.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
@@ -41,7 +41,7 @@ func Regular() {
 		lastRelease = nil
 	}
 
-	releases, err := cgController.CetFilledReleasesFromInfra(lastRelease, Settings.MainBranch, Settings.DevelopBranch)
+	releases, err := cgController.GetFilledReleasesFromInfra(lastRelease, Settings.MainBranch, Settings.DevelopBranch)
 	if err != nil {
 		panic(err)
 	}
@@ -49,6 +49,23 @@ func Regular() {
 
 	if localChangelog != nil {
 		changelogMixer := services.NewChangelogMixer()
+
+		// Before merge the changelogs, we need to ensure that the retrieved unreleased section doesn't contain a task
+		// already used in the local changelog
+		if localChangelog != nil && len(localChangelog.Releases) > 0 {
+			retrievedUnreleased := retrievedChangelog.Releases[0]
+			localChangelogExceptUnreleased := localChangelog.Releases[:len(localChangelog.Releases)-1]
+			for sec, sectionTasks := range retrievedUnreleased.Sections {
+				for i, task := range sectionTasks {
+					_, _, exists := changelogMixer.ChangelogContainsTask(*models.NewChangelog(localChangelogExceptUnreleased), task)
+					if exists {
+						retrievedUnreleased.Sections[sec] = remove(sectionTasks, i)
+					}
+				}
+			}
+			retrievedChangelog.Releases[0] = retrievedUnreleased
+		}
+
 		mergedChangelog := changelogMixer.MergeChangelogs(*localChangelog, *retrievedChangelog)
 		retrievedChangelog = &mergedChangelog
 	}
@@ -60,4 +77,9 @@ func Regular() {
 
 	fmt.Println("Done")
 
+	return retrievedChangelog
+}
+
+func remove(slice []models.Task, s int) []models.Task {
+	return append(slice[:s], slice[s+1:]...)
 }

@@ -130,6 +130,7 @@ func (gc *GitProvider) DefineCategory(task infrastructure.Task) application.Cate
 	return application.ADDED
 }
 
-func (gc *GitProvider) ReleaseURL(repo string, from *string, to string) string {
-	return "\"\""
+func (gc *GitProvider) ReleaseURL(from *string, to string) (*string, error) {
+	url := "\"\""
+	return &url, nil
 }

@@ -2,14 +2,13 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	services2 "gitlab.com/aoterocom/changelog-guardian/application/services"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
 	"gitlab.com/aoterocom/changelog-guardian/controller/services"
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
-	"os"
 	"strconv"
 	"time"
 )
@@ -47,18 +46,7 @@ func NewChangelogGuardianController(releaseProvider infraInterfaces.Provider, ta
 	return &ChangelogGuardianController{releaseProvider: releaseProvider, taskProvider: taskProvider, releaseFilters: releaseFilters, taskFilters: taskFilters}, nil
 }
 
-func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *models.Release, mainBranch string, defaultBranch string) (*[]models.Release, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	r, err := git.PlainOpen(cwd)
-	if err != nil {
-		return nil, err
-	}
-	remotes, _ := r.Remotes()
-	currentGitBAseUrl := remotes[0].Config().URLs[0]
-
+func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *models.Release, mainBranch string, defaultBranch string) (*[]models.Release, error) {
 	var from1 *time.Time
 	if lastRelease != nil {
 		layout := "2006-01-02T15:04:05"
@@ -121,8 +109,14 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 			releaseFrom = infraTruncatedReleases[i+1]
 			timeFrom = &releaseFrom.Time
 		} else {
-			mainBranch = "develop"
-			timeFrom = nil
+			if lastRelease != nil {
+				layout := "2006-01-02T15:04:05"
+				str := lastRelease.Date + "T00:00:00"
+				t, _ := time.Parse(layout, str)
+				timeFrom = &t
+			} else {
+				timeFrom = nil
+			}
 		}
 
 		// Obtain the tasks between the last release to this one (or to now)
@@ -152,13 +146,32 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 	var releaseUrl string
 	if len(infraTruncatedReleases) == 0 && len(*releases) != 0 {
 		from = &(*releases)[len(*releases)-1].Time
-		releaseUrl = cgc.releaseProvider.ReleaseURL(currentGitBAseUrl, &(*releases)[0].Name, defaultBranch)
+		urlPointer, err := cgc.releaseProvider.ReleaseURL(&(*releases)[0].Name, defaultBranch)
+		releaseUrl = *urlPointer
+		if err != nil {
+			return nil, err
+		}
 	} else if len(infraTruncatedReleases) != 0 {
 		from = &infraTruncatedReleases[len(infraTruncatedReleases)-1].Time
-		releaseUrl = cgc.releaseProvider.ReleaseURL(currentGitBAseUrl, &infraTruncatedReleases[0].Name, defaultBranch)
+		urlPointer, err := cgc.releaseProvider.ReleaseURL(&infraTruncatedReleases[0].Name, defaultBranch)
+		releaseUrl = *urlPointer
+		if err != nil {
+			return nil, err
+		}
 	} else {
-		from = nil
-		releaseUrl = cgc.releaseProvider.ReleaseURL(currentGitBAseUrl, nil, defaultBranch)
+		if lastRelease != nil {
+			layout := "2006-01-02T15:04:05"
+			str := lastRelease.Date + "T00:00:00"
+			t, _ := time.Parse(layout, str)
+			from = &t
+		} else {
+			from = nil
+		}
+		urlPointer, err := cgc.releaseProvider.ReleaseURL(nil, defaultBranch)
+		releaseUrl = *urlPointer
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	unreleasedTasks, _ := cgc.taskProvider.GetTasks(from, nil, defaultBranch)
@@ -169,9 +182,19 @@ func (cgc *ChangelogGuardianController) CetFilledReleasesFromInfra(lastRelease *
 	unreleasedRelease := models.NewRelease("UNRELEASED", "",
 		releaseUrl, false, nil)
 	for _, task := range *unreleasedTasks {
-		category := cgc.releaseProvider.DefineCategory(task)
-		unreleasedRelease.Sections[category] = append(unreleasedRelease.Sections[category],
-			*services.NewModelMapperService().InfraTaskToApplicationModel(task))
+		// If the tasks in unreleased were not in previous release, we append it to the final unreleased section
+		cm := services2.ChangelogMixer{}
+		lastReleaseContainsTask := false
+		if lastRelease != nil {
+			_, _, lastReleaseContainsTask = cm.ReleaseContainsTask(*lastRelease,
+				*services.NewModelMapperService().InfraTaskToApplicationModel(task))
+		}
+
+		if !lastReleaseContainsTask {
+			category := cgc.releaseProvider.DefineCategory(task)
+			unreleasedRelease.Sections[category] = append(unreleasedRelease.Sections[category],
+				*services.NewModelMapperService().InfraTaskToApplicationModel(task))
+		}
 	}
 
 	appTruncatedReleases = append(appTruncatedReleases, *unreleasedRelease)
