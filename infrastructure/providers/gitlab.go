@@ -122,7 +122,7 @@ func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		for _, change := range mergeRequest.Changes {
 			fileChanges = append(fileChanges, change.NewPath)
 		}
-		gitTask := infrastructure.NewTask("!"+strconv.Itoa(mergeRequest.IID), "!"+strconv.Itoa(mergeRequest.IID), mergeRequest.Title, mergeRequest.WebURL, "@"+mergeRequest.Author.Username,
+		gitTask := infrastructure.NewTask("!"+strconv.Itoa(mergeRequest.IID), "!"+strconv.Itoa(mergeRequest.IID), mergeRequest.Title, mergeRequest.WebURL, mergeRequest.Author.Username,
 			mergeRequest.Author.WebURL, labelStrings, fileChanges)
 		gitTask.Category = gp.DefineCategory(*gitTask)
 		gitTasks = append(gitTasks, *gitTask)
@@ -188,6 +188,50 @@ func (gp *GitlabProvider) ReleaseURL(from *string, to string) (*string, error) {
 
 	url := "https://gitlab.com/" + gitlabProjectName + "/-/merge_requests?scope=all&state=merged&target_branch=" + to
 	return &url, nil
+}
+
+func (gp *GitlabProvider) GetTask(taskId string) (*infrastructure.Task, error) {
+	currentGitBAseUrl, err := gp.repoURL()
+	if err != nil {
+		return nil, err
+	}
+
+	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
+	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
+
+	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
+	project, _, err := gitlabClient.Projects.GetProject(namespacedRepo, &gitlab.GetProjectOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := strconv.Atoi(strings.Replace(taskId, "!", "", 1))
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the first page with projects.
+	mergeRequest, _, err := gitlabClient.MergeRequests.GetMergeRequest(project.ID,
+		id, &gitlab.GetMergeRequestsOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var labelStrings []string
+	labels := mergeRequest.Labels
+	for _, label := range labels {
+		labelStrings = append(labelStrings, label)
+	}
+
+	var fileChanges []string
+	for _, change := range mergeRequest.Changes {
+		fileChanges = append(fileChanges, change.NewPath)
+	}
+
+	gitTask := infrastructure.NewTask("!"+strconv.Itoa(mergeRequest.IID), "!"+strconv.Itoa(mergeRequest.IID), mergeRequest.Title, mergeRequest.WebURL, "@"+mergeRequest.Author.Username,
+		mergeRequest.Author.WebURL, labelStrings, fileChanges)
+
+	return gitTask, nil
 }
 
 func (gp *GitlabProvider) repoURL() (*string, error) {

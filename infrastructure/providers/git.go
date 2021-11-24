@@ -5,6 +5,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	application "gitlab.com/aoterocom/changelog-guardian/application/models"
+	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"os"
 	"strings"
@@ -128,6 +129,54 @@ func (gc *GitProvider) GetTasks(from *time.Time, to *time.Time, targetBranch str
 
 func (gc *GitProvider) DefineCategory(task infrastructure.Task) application.Category {
 	return application.ADDED
+}
+
+func (gc *GitProvider) GetTask(taskId string) (*infrastructure.Task, error) {
+	var path string
+	var err error
+
+	path, err = os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return nil, err
+	}
+
+	w, err := r.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.ReferenceName(settings.Settings.DevelopBranch),
+	})
+
+	commit, err := r.CommitObject(plumbing.NewHash(taskId))
+	if err != nil {
+		return nil, err
+	}
+
+	files, err := commit.Files()
+	if err != nil {
+		return nil, err
+	}
+
+	var resultFiles []string
+	err = files.ForEach(func(file *object.File) error {
+		resultFiles = append(resultFiles, file.Name)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	gitTask := infrastructure.NewTask(commit.Hash.String()[:6], commit.Hash.String()[:6], strings.Split(commit.Message, "\n")[0], commit.Hash.String(), commit.Author.Name,
+		"mailto:"+commit.Author.Email, nil, resultFiles)
+
+	return gitTask, nil
 }
 
 func (gc *GitProvider) ReleaseURL(from *string, to string) (*string, error) {
