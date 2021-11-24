@@ -15,6 +15,7 @@ import (
 
 type GitlabProvider struct {
 	GitToken string
+	repo     *string
 }
 
 func init() {
@@ -22,9 +23,10 @@ func init() {
 	_ = godotenv.Load(cwd + "/vars.env")
 }
 
-func NewGitlabProvider() *GitlabProvider {
+func NewGitlabProvider(repo *string) *GitlabProvider {
 	return &GitlabProvider{
 		GitToken: os.Getenv("GITLAB_TOKEN"),
+		repo:     repo,
 	}
 }
 
@@ -235,6 +237,9 @@ func (gp *GitlabProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 }
 
 func (gp *GitlabProvider) repoURL() (*string, error) {
+	if gp.repo != nil {
+		return gp.repo, nil
+	}
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err

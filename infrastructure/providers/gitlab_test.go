@@ -36,13 +36,15 @@ func TestGitlabProvider_GetReleases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			glc := NewGitlabProvider()
+			glc := NewGitlabProvider(tt.args.repo)
 			got, err := glc.GetReleases(nil, nil)
 			if (err != nil) && tt.wantErr {
 				return
 			}
-			if !reflect.DeepEqual(len(*got), tt.want) {
-				t.Errorf("GetReleases() got = %v, want %v", len(*got), tt.want)
+			if got != nil {
+				if !reflect.DeepEqual(len(*got), tt.want) {
+					t.Errorf("GetReleases() got = %v, want %v", len(*got), tt.want)
+				}
 			}
 		})
 	}
@@ -89,7 +91,7 @@ func TestGitlabProvider_GetTasks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			glc := NewGitlabProvider()
+			glc := NewGitlabProvider(tt.args.repo)
 			got, err := glc.GetTasks(tt.args.from, tt.args.to, tt.args.targetBranch)
 			if (err != nil) && tt.wantErr {
 				return
