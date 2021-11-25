@@ -78,6 +78,18 @@ Fetch already merged Merge Requests as tasks. Remember that you can customize yo
 
 Changelog Guardian Pipes are little fragments of code that filter the releases and the tasks as you need.
 
+The pipes can be combined and Changelog Guardian will make each release/task go through them in an ordered way.
+
+For example, using the `gitlab_resolver` and the `natural_language` task pipes simultaneously
+
+```yml
+taskPipes: [ 'gitlab_resolver', 'natural_language']
+```
+
+will result in something like:
+
+`Resolve "Add new provider"` -> `Add new provider` -> `Added new provider`
+
 #### Semver release Pipe
 
 Filter the releases and allows only those which matches Semantic Versioning nomenclatures.
