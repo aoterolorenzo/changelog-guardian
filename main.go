@@ -15,8 +15,10 @@ limitations under the License.
 */
 package main
 
-import "gitlab.com/aoterocom/CLogger/cmd"
+import (
+	"gitlab.com/aoterocom/changelog-guardian/cli"
+)
 
 func main() {
-	cmd.Execute()
+	cli.Execute()
 }

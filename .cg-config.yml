@@ -1,0 +1,3 @@
+releaseProvider: gitlab
+tasksProvider: gitlab
+taskPipes: [ 'gitlab_resolver', 'natural_language' ]

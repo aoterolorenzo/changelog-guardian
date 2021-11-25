@@ -1,0 +1,23 @@
+changelogPath: ./CHANGELOG.md
+mainBranch: main
+defaultBranch: develop
+cgConfigPath: .cg-config.yml
+style: markdown
+providers:
+  gitlab:
+    labels:
+      Breaking Changes: kind::breaking
+      Added: kind::feature
+      Changed: kind::perf
+      Refactor: kind::refactor
+      Fixed: kind::bugfix
+      Dependencies: kind::dependencies
+      Deprecated: kind::deprecation
+      Removed: kind::removal
+      Documentation: kind::docs
+      Security: kind::security
+releaseProvider: git
+tasksProvider: git
+releasePipes: [ 'semver' ]
+taskPipes: []
+initialVersion: 0.1.0
