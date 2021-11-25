@@ -41,4 +41,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [!13](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/13) Fixed forcing specific bump type behaviour on release command ([@aoterocom](https://gitlab.com/aoterocom))
 
 [UNRELEASED]: https://gitlab.com/aoterocom/changelog-guardian/-/compare/0.1.0...develop
-[0.1.0]: https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests?scope=all&state=merged&target_branch=0.1.0
+[1.0.0]: https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests?scope=all&state=merged&target_branch=0.1.0
