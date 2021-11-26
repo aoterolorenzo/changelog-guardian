@@ -14,7 +14,16 @@ import (
 
 func ReleaseCmd(cmd *cobra.Command, args []string) {
 	// Update current CHANGELOG to prepare for release, using the regular command
-	changelog := RegularCmd()
+	changelog := RegularCmd(cmd, args)
+
+	argTemplate := cmd.Flag("template").Value.String()
+	if argTemplate != "" {
+		Settings.Style = argTemplate
+	}
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
+	if err != nil {
+		panic(err)
+	}
 
 	// Load args:
 	argPatch, _ := strconv.ParseBool(cmd.Flag("patch").Value.String())
@@ -29,11 +38,6 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	var nextVersion string
 	var lastRelease *models.Release
 	semVer := services.NewSemVerService()
-
-	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
-	if err != nil {
-		panic(err)
-	}
 
 	if argForce && argVersion != "" {
 		nextVersion = argVersion

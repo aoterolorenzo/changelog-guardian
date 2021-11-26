@@ -12,7 +12,11 @@ import (
 
 func YankCmd(cmd *cobra.Command, args []string) {
 
-	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
+	argTemplate := cmd.Flag("template").Value.String()
+	if argTemplate != "" {
+		Settings.Style = argTemplate
+	}
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
 	if err != nil {
 		panic(err)
 	}

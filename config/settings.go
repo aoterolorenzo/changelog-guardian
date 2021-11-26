@@ -32,11 +32,37 @@ type GlobalSettings struct {
 	TaskPipes       []string `yaml:"taskPipes"`
 	InitialVersion  string   `yaml:"initialVersion"`
 	Style           string   `yaml:"style"`
+	StylesConfig    struct {
+		StylishMarkdown struct {
+			Categories map[models.Category][]string `yaml:"categories"`
+		} `yaml:"stylish_markdown"`
+	} `yaml:"stylesCfg"`
 }
 
 func init() {
 	fmt.Println("Constructing internal settings...")
 	if err := extractSettings(settingsFile); err != nil {
+		log.Panicln(err)
+	}
+
+	fmt.Println("Retrieving settings from " + Settings.CGConfigPath + "...")
+	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
+	if err != nil {
+		fmt.Printf(Settings.CGConfigPath + " not available. Skipping...")
+	} else {
+		if err := extractSettings(string(yamlFile)); err != nil {
+			log.Panicln(err)
+		}
+	}
+
+	fmt.Println("Settings successfully retrieved.")
+}
+
+func (g *GlobalSettings) RetrieveSettingsFromFile(file string) {
+	settingsFile, err := ioutil.ReadFile(file)
+
+	fmt.Println("Constructing internal settings...")
+	if err := extractSettings(string(settingsFile)); err != nil {
 		log.Panicln(err)
 	}
 

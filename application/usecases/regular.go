@@ -3,6 +3,7 @@ package usecases
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
@@ -10,9 +11,13 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
 )
 
-func RegularCmd() *models.Changelog {
+func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 
-	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
+	argTemplate := cmd.Flag("template").Value.String()
+	if argTemplate != "" {
+		Settings.Style = argTemplate
+	}
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
 	if err != nil {
 		panic(err)
 	}

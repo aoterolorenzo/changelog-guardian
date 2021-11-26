@@ -19,7 +19,7 @@ var regularCmd = &cobra.Command{
 	Long:  `Keep you're changelog safe and punish those who dare to manually edit it`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		usecases.RegularCmd()
+		usecases.RegularCmd(cmd, args)
 	},
 }
 
@@ -29,7 +29,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	regularCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.clg.yml)")
+	regularCmd.PersistentFlags().String("template", "", "CHANGELOG template")
 }
 
 func initConfig() {

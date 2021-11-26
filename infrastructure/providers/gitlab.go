@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/joho/godotenv"
 	"github.com/xanzy/go-gitlab"
@@ -75,6 +76,14 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 }
 
 func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
+
+	if from != nil {
+		fmt.Println("from" + from.String())
+	}
+	if to != nil {
+		fmt.Println("to" + to.String())
+	}
+
 	currentGitBAseUrl, err := gp.repoURL()
 	if err != nil {
 		return nil, err

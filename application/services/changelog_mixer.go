@@ -19,7 +19,7 @@ func (cm *ChangelogMixer) MergeChangelogs(changelog1 models.Changelog, changelog
 	// If not, just save the changelog2 unreleased section
 	var unreleased models.Release
 	if cm.ChangelogContainsRelease(changelog1,
-		*models.NewRelease("UNRELEASED", "", "", false, nil)) {
+		*models.NewRelease("Unreleased", "", "", false, nil)) {
 		unreleased = *cm.MergeReleases(changelog2.Releases[0], changelog1.Releases[0])
 		changelog1.Releases = changelog1.Releases[1:]
 

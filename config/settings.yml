@@ -21,3 +21,16 @@ tasksProvider: git
 releasePipes: [ 'semver' ]
 taskPipes: []
 initialVersion: 0.1.0
+stylesCfg:
+  stylish_markdown:
+    categories:
+      Breaking Changes: ['f70000','🚨']
+      Added: ['5ccb31','✨']
+      Changed: ['31cb7d','✒️']
+      Refactor: ['cba531','🏗']
+      Fixed: ['cb3131','🐛']
+      Dependencies: ['cb6b31','📦']
+      Deprecated: ['4e31cb','✖️']
+      Removed: ['7631cb','❌']
+      Documentation: ['3188cb','📖']
+      Security: ['b841a0','🔒']
