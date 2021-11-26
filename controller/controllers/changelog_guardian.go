@@ -120,7 +120,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		}
 
 		// Obtain the tasks between the last release to this one (or to now)
-		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, mainBranch)
+		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, defaultBranch)
 		if err != nil {
 			return nil, err
 		}
@@ -179,7 +179,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	// Pass tasks through Task Pipes
 	*unreleasedTasks = cgc.throughTaskPipes(*unreleasedTasks)
 
-	unreleasedRelease := models.NewRelease("UNRELEASED", "",
+	unreleasedRelease := models.NewRelease("Unreleased", "",
 		releaseUrl, false, nil)
 	for _, task := range *unreleasedTasks {
 		// If the tasks in unreleased were not in previous release, we append it to the final unreleased section

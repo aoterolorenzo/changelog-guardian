@@ -6,27 +6,28 @@ import (
 	"fmt"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"regexp"
 	"sort"
 	"strings"
 )
 
-const markdownTaskRegexp = `- \[(?P<taskName>[^]]+)?]\((?P<taskHref>[^)]+)?\)\s?(?P<taskTitle>[^@]+)?\s?\(?(@(?P<taskAuthor>[^]]+)?]\((?P<taskAuthorHref>[^)]+)\)\))?`
-const markdownReleaseRegexp = `## \[(?P<releaseVersion>[^\]]+)]( - (?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2}))?(?P<releaseYanked> \[YANKED])?`
-const markdownReleaseLinkRegexp = `\[VERSION]: (?P<releaseLink>.*)`
-const markdownCategoryRegexp = `### (?P<category>.*)`
+const stylishMarkdownTaskRegexp = `-\s[^\s]+\s\[(?P<taskName>[^]]+)?]\((?P<taskHref>[^)]+)?\)\s?(?P<taskTitle>[^@]+)?\s?\(?(@(?P<taskAuthor>[^]]+)?]\((?P<taskAuthorHref>[^)]+)\)\))?`
+const stylishMarkdownReleaseRegexp = `## \!\[(?P<releaseVersion>[^\]]+)](\s\!\[)?(?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2})?]?\(?(?P<releaseLink>[^)]+)?\)?(?P<releaseYanked> \!\[YANKED])?`
+const stylishMarkdownCategoryRegexp = `### \!\[(?P<category>.*)\]`
 
-type MarkDownChangelogService struct {
+type StylishMarkDownChangelogService struct {
 	AbstractChangelog
 }
 
-func NewMarkDownChangelogService() *MarkDownChangelogService {
-	return &MarkDownChangelogService{AbstractChangelog: AbstractChangelog{}}
+func NewStylishMarkDownChangelogService() *StylishMarkDownChangelogService {
+	return &StylishMarkDownChangelogService{AbstractChangelog: AbstractChangelog{}}
 }
 
-func (c *MarkDownChangelogService) Parse(pathToChangelog string) (*models.Changelog, error) {
+func (c *StylishMarkDownChangelogService) Parse(pathToChangelog string) (*models.Changelog, error) {
 	changelog := models.NewChangelog()
 	changelogReader, err := os.Open(pathToChangelog)
 	if err != nil {
@@ -66,7 +67,7 @@ func (c *MarkDownChangelogService) Parse(pathToChangelog string) (*models.Change
 	return changelog, nil
 }
 
-func (c *MarkDownChangelogService) String(changelog models.Changelog) string {
+func (c *StylishMarkDownChangelogService) String(changelog models.Changelog) string {
 	const changelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
 		"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
 		"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
@@ -77,36 +78,52 @@ func (c *MarkDownChangelogService) String(changelog models.Changelog) string {
 		changelogStr += c.ReleaseToString(release)
 	}
 
-	if len(changelog.Releases) > 0 {
-		changelogStr += "\n"
-		for i, release := range changelog.Releases {
-			changelogStr += "[" + release.Version + "]: " + release.Link
-			if i != len(changelog.Releases)-1 {
-				changelogStr += fmt.Sprintln()
-			}
+	for _, release := range changelog.Releases {
+		dashedVersion := strings.ReplaceAll(release.Version, "", "")
+		urlEscapedDashedVersion := url.QueryEscape(dashedVersion)
+		var presentStr = "Release"
+		if release.Version == "Unreleased" {
+			presentStr = ""
 		}
-		changelogStr += "\n"
+		changelogStr += fmt.Sprintf("\n[%s]: https://img.shields.io/badge/%s-%s-blueviolet?&style=for-the-badge", release.Version, presentStr, urlEscapedDashedVersion)
+		if release.Date != "" {
+			changelogStr += fmt.Sprintf("\n[%s]: https://img.shields.io/badge/-%s-white?&style=for-the-badge", release.Date, strings.ReplaceAll(release.Date, "-", "--"))
+		}
 	}
+
+	keys := make([]string, 0, len(settings.Settings.StylesConfig.StylishMarkdown.Categories))
+	for k := range settings.Settings.StylesConfig.StylishMarkdown.Categories {
+		keys = append(keys, string(k))
+	}
+	sort.Strings(keys)
+
+	for _, val := range keys {
+
+		changelogStr += fmt.Sprintf("\n[%s]: https://img.shields.io/badge/-%s-%s.svg?&style=flat-square", val, url.QueryEscape(strings.ToUpper(string(val))), settings.Settings.StylesConfig.StylishMarkdown.Categories[models.Category(val)][0])
+	}
+
+	changelogStr += "\n"
+
 	return changelogStr
 
 }
 
-func (c *MarkDownChangelogService) ReleaseToString(r models.Release) string {
+func (c *StylishMarkDownChangelogService) ReleaseToString(r models.Release) string {
 	var yankedStr string
 
 	if r.Yanked {
-		yankedStr = " [YANKED]"
+		yankedStr = " ![YANKED]"
 	}
 	var dateStr string
 	if r.Date != "" {
-		dateStr = " - " + r.Date
+		dateStr = " ![" + r.Date + "]"
 	}
 
-	if strings.ToUpper(r.Version) == "UNRELEASED" {
+	if strings.ToUpper(r.Version) == "Unreleased" {
 		dateStr = ""
 	}
 
-	releaseStr := fmt.Sprintf("\n## [%s]%s%s", r.Version, dateStr, yankedStr)
+	releaseStr := fmt.Sprintf("\n## ![%s]%s%s", r.Version, dateStr, yankedStr)
 	releaseStr += "\n"
 
 	keys := make([]string, 0, len(r.Sections))
@@ -116,24 +133,28 @@ func (c *MarkDownChangelogService) ReleaseToString(r models.Release) string {
 	sort.Strings(keys)
 
 	for _, key := range keys {
-		releaseStr += fmt.Sprintf("\n### %s\n\n", key)
+		releaseStr += fmt.Sprintf("\n### ![%s]\n\n", key)
 		for _, task := range r.Sections[models.Category(key)] {
-			releaseStr += fmt.Sprintf(c.TaskToString(task, ""))
+			releaseStr += fmt.Sprintf(c.TaskToString(task, models.Category(key)))
 			releaseStr += fmt.Sprintln()
 		}
 	}
 	return releaseStr
 }
 
-func (c *MarkDownChangelogService) TaskToString(t models.Task, category models.Category) string {
+func (c *StylishMarkDownChangelogService) TaskToString(t models.Task, category models.Category) string {
 	var authorString string
 	if t.Author != "" {
+
 		authorString = fmt.Sprintf(" ([@%s](%s))", t.Author, t.AuthorHref)
 	}
-	return fmt.Sprintf("- [%s](%s) %s%s", t.ID, t.Href, t.Title, authorString)
+
+	var categoryEmoji = settings.Settings.StylesConfig.StylishMarkdown.Categories[category][1]
+
+	return fmt.Sprintf("- %s [%s](%s) %s%s", categoryEmoji, t.ID, t.Href, t.Title, authorString)
 }
 
-func (c *MarkDownChangelogService) SaveChangelog(changelog models.Changelog, filePath string) error {
+func (c *StylishMarkDownChangelogService) SaveChangelog(changelog models.Changelog, filePath string) error {
 	f, err := os.Create(filePath)
 
 	if err != nil {
@@ -152,10 +173,10 @@ func (c *MarkDownChangelogService) SaveChangelog(changelog models.Changelog, fil
 
 }
 
-func (c *MarkDownChangelogService) parseTask(line string, fullChangelog string) models.Task {
+func (c *StylishMarkDownChangelogService) parseTask(line string, fullChangelog string) models.Task {
 
 	t := models.NewEmptyTask()
-	r := regexp.MustCompile(markdownTaskRegexp)
+	r := regexp.MustCompile(stylishMarkdownTaskRegexp)
 	match := r.FindStringSubmatch(line)
 	paramsMap := make(map[string]string)
 	for i, name := range r.SubexpNames() {
@@ -172,10 +193,10 @@ func (c *MarkDownChangelogService) parseTask(line string, fullChangelog string) 
 	return *t
 }
 
-func (c *MarkDownChangelogService) parseRelease(line string, fullChangelog string) *models.Release {
+func (c *StylishMarkDownChangelogService) parseRelease(line string, fullChangelog string) *models.Release {
 
 	r := models.NewEmptyRelease()
-	rg := regexp.MustCompile(markdownReleaseRegexp)
+	rg := regexp.MustCompile(stylishMarkdownReleaseRegexp)
 	match := rg.FindStringSubmatch(line)
 	paramsMap := make(map[string]string)
 	for i, name := range rg.SubexpNames() {
@@ -185,26 +206,15 @@ func (c *MarkDownChangelogService) parseRelease(line string, fullChangelog strin
 	}
 	r.Version = paramsMap["releaseVersion"]
 	r.Date = paramsMap["releaseDate"]
+	r.Link = paramsMap["releaseDate"]
 	if paramsMap["releaseYanked"] != "" {
 		r.Yanked = true
 	}
-
-	m := regexp.MustCompile("(\\\\|\\^|\\.|\\||\\?|\\*|\\+|\\{|\\}|\\(|\\)|\\[|\\])")
-	escapedVersion := m.ReplaceAllString(r.Version, "\\$1")
-	rg = regexp.MustCompile(strings.Replace(markdownReleaseLinkRegexp, "VERSION", escapedVersion, 1))
-	match = rg.FindStringSubmatch(fullChangelog)
-	paramsMap = make(map[string]string)
-	for i, name := range rg.SubexpNames() {
-		if i > 0 && i <= len(match) {
-			paramsMap[name] = match[i]
-		}
-	}
-	r.Link = paramsMap["releaseLink"]
 	return r
 }
 
-func (c *MarkDownChangelogService) parseCategory(line string) models.Category {
-	r := regexp.MustCompile(markdownCategoryRegexp)
+func (c *StylishMarkDownChangelogService) parseCategory(line string) models.Category {
+	r := regexp.MustCompile(stylishMarkdownCategoryRegexp)
 	match := r.FindStringSubmatch(line)
 	paramsMap := make(map[string]string)
 	for i, name := range r.SubexpNames() {

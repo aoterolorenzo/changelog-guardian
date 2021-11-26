@@ -16,6 +16,14 @@ import (
 
 func InsertCmd(cmd *cobra.Command, args []string) {
 
+	argTemplate := cmd.Flag("template").Value.String()
+	if argTemplate != "" {
+		Settings.Style = argTemplate
+	}
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
+	if err != nil {
+		panic(err)
+	}
 	// Load args:
 	argTitle := cmd.Flag("title").Value.String()
 	argId := cmd.Flag("id").Value.String()
@@ -27,11 +35,6 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 
 	if argId == "" {
 		fmt.Println("--id argument is mandatory")
-	}
-
-	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
-	if err != nil {
-		panic(err)
 	}
 
 	var taskFromProvider = &models.Task{}
