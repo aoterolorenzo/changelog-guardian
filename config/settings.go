@@ -17,11 +17,12 @@ var settingsFile string
 var Settings = &GlobalSettings{}
 
 type GlobalSettings struct {
-	ChangelogPath string `yaml:"changelogPath"`
-	MainBranch    string `yaml:"mainBranch"`
-	DevelopBranch string `yaml:"defaultBranch"`
-	CGConfigPath  string `yaml:"cgConfigPath"`
-	Providers     struct {
+	ChangelogPath    string `yaml:"changelogPath"`
+	ReleaseNotesPath string `yaml:"releaseNotesPath"`
+	MainBranch       string `yaml:"mainBranch"`
+	DevelopBranch    string `yaml:"defaultBranch"`
+	CGConfigPath     string `yaml:"cgConfigPath"`
+	Providers        struct {
 		Gitlab struct {
 			Labels map[models.Category]string `yaml:"labels"`
 		} `yaml:"gitlab"`
