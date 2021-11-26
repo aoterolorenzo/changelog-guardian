@@ -18,6 +18,9 @@ import (
 const stylishMarkdownTaskRegexp = `-\s[^\s]+\s\[(?P<taskName>[^]]+)?]\((?P<taskHref>[^)]+)?\)\s?(?P<taskTitle>[^@]+)?\s?\(?(@(?P<taskAuthor>[^]]+)?]\((?P<taskAuthorHref>[^)]+)\)\))?`
 const stylishMarkdownReleaseRegexp = `## \!\[(?P<releaseVersion>[^\]]+)](\s\!\[)?(?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2})?]?\(?(?P<releaseLink>[^)]+)?\)?(?P<releaseYanked> \!\[YANKED])?`
 const stylishMarkdownCategoryRegexp = `### \!\[(?P<category>.*)\]`
+const stylishMarkdownChangelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
+	"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
+	"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
 type StylishMarkDownChangelogService struct {
 	AbstractChangelog
@@ -68,12 +71,15 @@ func (c *StylishMarkDownChangelogService) Parse(pathToChangelog string) (*models
 }
 
 func (c *StylishMarkDownChangelogService) String(changelog models.Changelog) string {
-	const changelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
-		"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
-		"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
-	changelogStr := changelogHeader
+	changelogStr := stylishMarkdownChangelogHeader
 	changelogStr += "\n"
+	changelogStr += c.NudeChangelogString(changelog)
+	return changelogStr
+}
+
+func (c *StylishMarkDownChangelogService) NudeChangelogString(changelog models.Changelog) string {
+	var changelogStr string
 	for _, release := range changelog.Releases {
 		changelogStr += c.ReleaseToString(release)
 	}
@@ -105,7 +111,6 @@ func (c *StylishMarkDownChangelogService) String(changelog models.Changelog) str
 	changelogStr += "\n"
 
 	return changelogStr
-
 }
 
 func (c *StylishMarkDownChangelogService) ReleaseToString(r models.Release) string {

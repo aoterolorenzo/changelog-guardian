@@ -1,4 +1,5 @@
 changelogPath: ./CHANGELOG.md
+releaseNotesPath: ./RELEASE-NOTES.md
 mainBranch: main
 defaultBranch: develop
 cgConfigPath: .cg-config.yml

@@ -17,6 +17,9 @@ const markdownTaskRegexp = `- \[(?P<taskName>[^]]+)?]\((?P<taskHref>[^)]+)?\)\s?
 const markdownReleaseRegexp = `## \[(?P<releaseVersion>[^\]]+)]( - (?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2}))?(?P<releaseYanked> \[YANKED])?`
 const markdownReleaseLinkRegexp = `\[VERSION]: (?P<releaseLink>.*)`
 const markdownCategoryRegexp = `### (?P<category>.*)`
+const markdownChangelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
+	"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
+	"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
 type MarkDownChangelogService struct {
 	AbstractChangelog
@@ -67,12 +70,16 @@ func (c *MarkDownChangelogService) Parse(pathToChangelog string) (*models.Change
 }
 
 func (c *MarkDownChangelogService) String(changelog models.Changelog) string {
-	const changelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
-		"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
-		"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
-	changelogStr := changelogHeader
+	changelogStr := markdownChangelogHeader
 	changelogStr += "\n"
+	changelogStr += c.NudeChangelogString(changelog)
+	return changelogStr
+
+}
+
+func (c *MarkDownChangelogService) NudeChangelogString(changelog models.Changelog) string {
+	var changelogStr string
 	for _, release := range changelog.Releases {
 		changelogStr += c.ReleaseToString(release)
 	}
@@ -87,8 +94,8 @@ func (c *MarkDownChangelogService) String(changelog models.Changelog) string {
 		}
 		changelogStr += "\n"
 	}
-	return changelogStr
 
+	return changelogStr
 }
 
 func (c *MarkDownChangelogService) ReleaseToString(r models.Release) string {

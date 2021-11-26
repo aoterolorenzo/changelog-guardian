@@ -1,7 +1,5 @@
 # Changelog Guardian
 
-
-
 ## Getting started
 
 Changelog Guardian is the tool that will help you to keep your Changelog safely automated and up to date.
@@ -25,7 +23,8 @@ The default configuration above-mentioned can be customised and overwritten on a
 This file could contain only one or various configuration parameters. Here is an example of all the parameters that forms the Changelog Guardian configuration:
 
 ```yml
-changelogPath: ./CHANGELOG.md #Path to the project's Changelog File
+changelogPath: ./CHANGELOG.md # Path to the project's Changelog File
+releaseNotesPath: ./RELEASE-NOTES.md # Path to the file where to save generated Release Notes
 mainBranch: main # Main branch of the repository
 defaultBranch: develop # Default/develop branch of the repository
 providers: # Internal configuration of the Changelog Guardian providers
@@ -47,6 +46,19 @@ style: markdown # Changelog style (theming)
 releasePipes: [ 'semver' ] # Release pipes
 taskPipes: [] # Task pipes
 initialVersion: 0.1.0 # Initial version for generating an initial release
+stylesCfg:
+  stylish_markdown:
+    categories: // Selects a color and an emoji for Categories on template generated CHANGELOG's
+      Breaking Changes: ['f70000','🚨']
+      Added: ['5ccb31','✨']
+      Changed: ['31cb7d','✒️']
+      Refactor: ['cba531','🏗']
+      Fixed: ['cb3131','🐛']
+      Dependencies: ['cb6b31','📦']
+      Deprecated: ['4e31cb','✖️']
+      Removed: ['7631cb','❌']
+      Documentation: ['3188cb','📖']
+      Security: ['b841a0','🔒']
 ```
 
 ### Providers
@@ -121,13 +133,19 @@ This pipe will filter your tasks (mostly for using with the Git task provider) f
 
 Maybe you would like to maintain a Changelog fed with some emojis. Or perhaps you want to generate a CHANGELOG.adoc in asciidoc. Changelog Styles are meant for exactly cover this ~~whims~~ needs.
 
-Currently, only one style is available: `markdown`
-
 #### Markdown Style
 
+Default Changelog Style. 
 Follows the [Keep A Changelog](https://keepachangelog.com/en/1.1.0/#how) specification.
 
-NOTE: More styles about to come: `asciidoc`, `markdown_fun` (with emojis)
+Style code: `markdown`
+
+#### Stylish Markdown Style
+
+Markdown Style fed with some emojis and badges. 
+Follows the [Keep A Changelog](https://keepachangelog.com/en/1.1.0/#how) specification.
+
+Style code: `stylish_markdown`
 
 ## Usage
 
@@ -159,7 +177,18 @@ Flags:
 You can generate a changelog with the base command from a folder containing a git repository. This will generate a `CHANGELOG.md` file automatically with the default settings.
 
 ```bash
-$> changelog-guardian [command]
+$> changelog-guardian
+```
+
+```
+Usage:
+  changelog-guardian [flags]
+
+Flags:
+ 
+  --template             CHANGELOG template
+  
+  -h, --help             Prints help
 ```
 
 ### Release
@@ -183,7 +212,8 @@ Flags:
   -f, --force            Forces the versioning altough differs from the calculated one
       --pre string       Pre-release string (semver)
       --build string     Build metadata (semver)
-      
+  --template             CHANGELOG template
+  
   -h, --help             Prints help
 ```
 
@@ -208,7 +238,8 @@ Flags:
   -v, --authorLink string     Task author link
   -c, --category string       Task category (default "Added")
   -s, --skip-autocompletion   Skip autocompletion from providerUsed to check the task data from it through the provided --id
-
+  --template             CHANGELOG template
+  
   -h, --help                  Prints help
 ```
 
@@ -225,6 +256,27 @@ $> changelog-guardian yank
 
 Flags:
   -v, --version string   Version to yank
+  --template             CHANGELOG template
+  
+  -h, --help             Prints help
+```
+
+### Yank
+
+Generates the Release Notes for the last released version (or the one specified by the --version flag).
+
+```bash
+$> changelog-guardian yank
+```
+
+```
+  changelog-guardian yank [flags]
+
+Flags:
+  -v, --version string      Version to yank
+  -o, --output-file string   Output file
+  -e, --echo                Echo Release Notes on screen
+  --template                CHANGELOG template
   
   -h, --help             Prints help
 ```
