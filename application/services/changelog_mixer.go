@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 )
@@ -95,8 +94,6 @@ func (cm *ChangelogMixer) ChangelogContainsTask(changelog models.Changelog, task
 	for _, release := range changelog.Releases {
 		for category, sectionTasks := range release.Sections {
 			for _, taskInChangelog := range sectionTasks {
-				fmt.Println(taskInChangelog)
-				fmt.Println(taskInChangelog.Category)
 				if task.ID == taskInChangelog.ID && category != models.REMOVED {
 					return &category, &task, true
 					// If the last entry of the task is removed, it's not contained since then

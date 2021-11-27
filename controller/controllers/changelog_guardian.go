@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	services2 "gitlab.com/aoterocom/changelog-guardian/application/services"
+	"gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
 	"gitlab.com/aoterocom/changelog-guardian/controller/services"
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
@@ -83,6 +83,8 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		infraTruncatedReleases = *releases
 	}
 
+	settings.Log.Debugf("Found %d releases\n", len(infraTruncatedReleases))
+
 	// Pass releases through Release Pipes
 	infraTruncatedReleases = cgc.throughReleasePipes(infraTruncatedReleases)
 
@@ -125,14 +127,13 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 			return nil, err
 		}
 
-		fmt.Println("Retrieved " + strconv.Itoa(len(*tasks)) + " tasks for Release " + release.Name + "...")
-
+		settings.Log.Debugf("Retrieved %s tasks for Release %s\n", strconv.Itoa(len(*tasks)), release.Name)
 		// Pass tasks through Task Pipes
 		*tasks = cgc.throughTaskPipes(*tasks)
 
 		// Map each task to an application layer model to add it to the release
 		for _, task := range *tasks {
-			fmt.Println("\t -> " + task.Name + " " + task.Title)
+			settings.Log.Debugf("-> %s %s\n", task.Name, task.Title)
 			appTruncatedRelease.Sections[task.Category] =
 				append(appTruncatedRelease.Sections[task.Category],
 					*services.NewModelMapperService().InfraTaskToApplicationModel(task))
@@ -175,6 +176,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	}
 
 	unreleasedTasks, _ := cgc.taskProvider.GetTasks(from, nil, defaultBranch)
+	settings.Log.Debugf("Retieved %d new unreleased tasks\n", len(*unreleasedTasks))
 
 	// Pass tasks through Task Pipes
 	*unreleasedTasks = cgc.throughTaskPipes(*unreleasedTasks)
@@ -191,6 +193,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		}
 
 		if !lastReleaseContainsTask {
+			settings.Log.Debugf("-> %s %s\n", task.Name, task.Title)
 			category := cgc.releaseProvider.DefineCategory(task)
 			unreleasedRelease.Sections[category] = append(unreleasedRelease.Sections[category],
 				*services.NewModelMapperService().InfraTaskToApplicationModel(task))

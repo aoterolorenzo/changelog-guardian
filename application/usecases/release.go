@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
@@ -41,7 +40,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 	if argForce && argVersion != "" {
 		nextVersion = argVersion
-		fmt.Println("WARNING: forcing a specific version is not recommended.")
+		Log.Warnf("\"WARNING: forcing a specific version is not recommended\n")
 	} else if len(changelog.Releases) > 1 {
 		unreleased := &changelog.Releases[0]
 		lastRelease = &changelog.Releases[1]
@@ -59,28 +58,28 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 			if argPatch {
 				checkVersion := semVer.BumpPatch(versionToBump)
 				if nextVersion != checkVersion {
-					fmt.Println("Cannot release a patch version: current tasks imply a minor/major version bump.")
+					Log.Errorf("Cannot release a patch version: current tasks imply a minor/major version bump\n")
 					return
 				}
 			}
 			if argMinor {
 				checkVersion := semVer.BumpMinor(versionToBump)
 				if nextVersion != checkVersion {
-					fmt.Println("Cannot release a minor version: no current tasks implying a minor version " +
-						"or at least implying breaking changes")
+					Log.Errorf("Cannot release a minor version: no current tasks implying a minor version " +
+						"or at least implying breaking changes\n")
 					return
 				}
 			}
 			if argMajor {
 				checkVersion := semVer.BumpMinor(versionToBump)
 				if nextVersion != checkVersion {
-					fmt.Println("Cannot release a major version: no breaking changes found")
+					Log.Errorf("Cannot release a major version: no breaking changes found\n")
 					return
 				}
 			}
 			if argVersion != "" {
 				if nextVersion != argVersion {
-					fmt.Println("Version breaks semver: current version expected would be " + nextVersion)
+					Log.Errorf("Version breaks semver: current version expected would be %s", nextVersion)
 					return
 				}
 			}
@@ -109,10 +108,12 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 
 	if !semVer.IsSemverValid(nextVersion) {
-		fmt.Println("Provider build metadata or pre-release breaks Semver. The result version string " +
-			nextVersion + " is not valid")
+		Log.Errorf("Provider build metadata or pre-release breaks Semver. "+
+			"The result version string %s is not valid", nextVersion)
 		return
 	}
+
+	Log.Infof("Preparing Changelog with Release %s\n", nextVersion)
 
 	// Convert UNRELEASED to nextVersion and add new UNRELEASE section
 	unreleased := &changelog.Releases[0]
@@ -150,4 +151,6 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+
+	Log.Infof("Changelog saved\n")
 }

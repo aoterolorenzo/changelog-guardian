@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
@@ -13,20 +12,24 @@ import (
 
 func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 
+	Log.Debugf("Preparing execution...\n")
 	argTemplate := cmd.Flag("template").Value.String()
 	if argTemplate != "" {
 		Settings.Style = argTemplate
 	}
+	Log.Debugf("Using %s template\n", Settings.Style)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
 	if err != nil {
 		panic(err)
 	}
 
+	Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
 	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
 		panic(err)
 	}
 
+	Log.Debugf("Tasks provider: %s\n", Settings.TasksProvider)
 	tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
 	if err != nil {
 		panic(err)
@@ -37,6 +40,7 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 		panic(err)
 	}
 
+	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
 		panic(err)
@@ -47,10 +51,14 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 	if localChangelog != nil {
 		if len(localChangelog.Releases) > 1 {
 			lastRelease = &localChangelog.Releases[1]
+			Log.Infof("Retrieving releases and tasks data from Release %s...\n", lastRelease.Version)
 		}
 	} else {
 		lastRelease = nil
+		Log.Infof("Retrieving release and tasks data...\n")
 	}
+
+	Log.Infof("Preparing Changelog...\n")
 
 	releases, err := cgController.GetFilledReleasesFromInfra(lastRelease, Settings.MainBranch, Settings.DevelopBranch)
 	if err != nil {
@@ -93,7 +101,7 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 		panic(err)
 	}
 
-	fmt.Println("Done")
+	Log.Infof("Changelog saved\n")
 
 	return retrievedChangelog
 }

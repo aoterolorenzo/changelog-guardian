@@ -3,35 +3,46 @@ package usecases
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"strconv"
+	"strings"
 )
 
 func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 
+	Log.Debugf("Preparing execution...\n")
 	argTemplate := cmd.Flag("template").Value.String()
 	argOutputFile := cmd.Flag("output-file").Value.String()
 	argEcho, _ := strconv.ParseBool(cmd.Flag("echo").Value.String())
 
+	if argEcho {
+		Log.SetLevel(logrus.ErrorLevel)
+	}
+
 	if argTemplate != "" {
 		Settings.Style = argTemplate
 	}
+	Log.Debugf("Using %s template\n", Settings.Style)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
 	if err != nil {
 		panic(err)
 	}
 
+	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		panic(err)
+		Log.Errorf("Changelog not found at %s\n", Settings.ChangelogPath)
+		return
 	}
 
 	argVersion := cmd.Flag("version").Value.String()
 
+	Log.Infof("Preparing Release Notes...\n")
 	var targetVersion string
 	if argVersion == "" {
 		if len(localChangelog.Releases) > 1 {
@@ -53,6 +64,11 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 			}
 
 			releaseNotes := (*changelogService).NudeChangelogString(*changelog)
+			if releaseNotes != "" {
+				// Truncates initial and ending line break it exists
+				releaseNotes = strings.TrimPrefix(releaseNotes, "\n")
+				releaseNotes = strings.TrimSuffix(releaseNotes, "\n")
+			}
 
 			if argEcho {
 				fmt.Println(releaseNotes)
@@ -67,11 +83,11 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 					panic(err)
 				}
 
-				fmt.Println("Release Notes written on " + Settings.ReleaseNotesPath)
+				Log.Infof("Release Notes saved on %s\n", Settings.ReleaseNotesPath)
 			}
 			return
 		}
 	}
 
-	fmt.Println("Version not found.")
+	Log.Errorf("Version not found\n")
 }

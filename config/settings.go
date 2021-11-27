@@ -1,7 +1,6 @@
 package settings
 
 import (
-	"fmt"
 	"github.com/imdario/mergo"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gopkg.in/yaml.v3"
@@ -41,43 +40,37 @@ type GlobalSettings struct {
 }
 
 func init() {
-	fmt.Println("Constructing internal settings...")
+	Log.Debugf("Generating internal settings...\n")
 	if err := extractSettings(settingsFile); err != nil {
 		log.Panicln(err)
 	}
 
-	fmt.Println("Retrieving settings from " + Settings.CGConfigPath + "...")
+	Log.Debugf("Retrieving settings from %s...\n", Settings.CGConfigPath)
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
 	if err != nil {
-		fmt.Printf(Settings.CGConfigPath + " not available. Skipping...")
+		Log.Debugf("File %s not available. Skilling\n", Settings.CGConfigPath)
 	} else {
 		if err := extractSettings(string(yamlFile)); err != nil {
 			log.Panicln(err)
 		}
 	}
-
-	fmt.Println("Settings successfully retrieved.")
+	Log.Debugf("Settings successfully generated\n")
 }
 
 func (g *GlobalSettings) RetrieveSettingsFromFile(file string) {
 	settingsFile, err := ioutil.ReadFile(file)
 
-	fmt.Println("Constructing internal settings...")
 	if err := extractSettings(string(settingsFile)); err != nil {
 		log.Panicln(err)
 	}
 
-	fmt.Println("Retrieving settings from " + Settings.CGConfigPath + "...")
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
 	if err != nil {
-		fmt.Printf(Settings.CGConfigPath + " not available. Skipping...")
 	} else {
 		if err := extractSettings(string(yamlFile)); err != nil {
 			log.Panicln(err)
 		}
 	}
-
-	fmt.Println("Settings successfully retrieved.")
 }
 
 func extractSettings(content string) error {

@@ -60,3 +60,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [Refactor]: https://img.shields.io/badge/-REFACTOR-cba531.svg?&style=flat-square
 [Removed]: https://img.shields.io/badge/-REMOVED-7631cb.svg?&style=flat-square
 [Security]: https://img.shields.io/badge/-SECURITY-b841a0.svg?&style=flat-square
+[YANKED]: https://img.shields.io/badge/-YANKED-blueviolet.svg?&style=for-the-badge
