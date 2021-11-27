@@ -30,6 +30,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	regularCmd.PersistentFlags().String("template", "", "CHANGELOG template")
+	regularCmd.PersistentFlags().String("output-template", "", "Output CHANGELOG template")
 }
 
 func initConfig() {

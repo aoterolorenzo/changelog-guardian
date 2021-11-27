@@ -84,6 +84,10 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 		retrievedChangelog = &mergedChangelog
 	}
 
+	argOutputTemplate := cmd.Flag("output-template").Value.String()
+	if argOutputTemplate != "" {
+		changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+	}
 	err = (*changelogService).SaveChangelog(*retrievedChangelog, Settings.ChangelogPath)
 	if err != nil {
 		panic(err)

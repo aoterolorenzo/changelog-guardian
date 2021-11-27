@@ -142,6 +142,10 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	changelog.Releases = append(changelog.Releases, *models.NewRelease("UNRELEASED", "", *newUnreleasedURL, false, nil))
 	helpers.ReverseAny(changelog.Releases)
 
+	argOutputTemplate := cmd.Flag("output-template").Value.String()
+	if argOutputTemplate != "" {
+		changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+	}
 	err = (*changelogService).SaveChangelog(*changelog, Settings.ChangelogPath)
 	if err != nil {
 		panic(err)

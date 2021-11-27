@@ -80,6 +80,10 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	argOutputTemplate := cmd.Flag("output-template").Value.String()
+	if argOutputTemplate != "" {
+		changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+	}
 	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
 		fmt.Println(err)
