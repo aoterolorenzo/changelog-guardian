@@ -47,7 +47,13 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 			changelog := models.NewChangelog()
 			changelog.Releases = []models.Release{release}
 
+			argOutputTemplate := cmd.Flag("output-template").Value.String()
+			if argOutputTemplate != "" {
+				changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+			}
+
 			releaseNotes := (*changelogService).NudeChangelogString(*changelog)
+
 			if argEcho {
 				fmt.Println(releaseNotes)
 			} else {

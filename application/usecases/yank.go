@@ -61,6 +61,10 @@ func YankCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	argOutputTemplate := cmd.Flag("output-template").Value.String()
+	if argOutputTemplate != "" {
+		changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+	}
 	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
 		panic(err)
