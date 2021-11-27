@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"fmt"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -16,10 +15,12 @@ import (
 
 func InsertCmd(cmd *cobra.Command, args []string) {
 
+	Log.Debugf("Preparing execution...\n")
 	argTemplate := cmd.Flag("template").Value.String()
 	if argTemplate != "" {
 		Settings.Style = argTemplate
 	}
+	Log.Debugf("Using %s template\n", Settings.Style)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
 	if err != nil {
 		panic(err)
@@ -34,11 +35,12 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 	argSkipAutocompletion, _ := strconv.ParseBool(cmd.Flag("skip-autocompletion").Value.String())
 
 	if argId == "" {
-		fmt.Println("--id argument is mandatory")
+		Log.Errorf("--id argument is mandatory\n")
 	}
 
 	var taskFromProvider = &models.Task{}
 	if !argSkipAutocompletion {
+		Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
 		tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
 		if err != nil {
 			panic(err)
@@ -49,6 +51,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 			panic(err)
 		}
 
+		Log.Debugf("Retrieving task info from provider\n")
 		taskFromProvider, err = cgController.GetTask(argId)
 		if err != nil {
 			return
@@ -56,6 +59,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 
 	}
 
+	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
 		panic(err)
@@ -74,9 +78,10 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 		helpers.ReverseAny(localChangelog.Releases[0].Sections[models.Category(argCategory)])
 		localChangelog.Releases[0].Sections[models.Category(argCategory)] =
 			append(localChangelog.Releases[0].Sections[models.Category(argCategory)], *task)
+		Log.Infof("Task successfully added\n")
 		helpers.ReverseAny(localChangelog.Releases[0].Sections[models.Category(argCategory)])
 	} else {
-		fmt.Println("Skipped: Task " + task.ID + " is already present on the CHANGELOG.")
+		Log.Infof("Task  %s is already present on the CHANGELOG. Skipping...\n", task.ID)
 		return
 	}
 
@@ -86,7 +91,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 	}
 	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
+	Log.Infof("Changelog saved\n")
 }

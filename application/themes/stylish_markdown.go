@@ -104,10 +104,9 @@ func (c *StylishMarkDownChangelogService) NudeChangelogString(changelog models.C
 	sort.Strings(keys)
 
 	for _, val := range keys {
-
 		changelogStr += fmt.Sprintf("\n[%s]: https://img.shields.io/badge/-%s-%s.svg?&style=flat-square", val, url.QueryEscape(strings.ToUpper(string(val))), settings.Settings.StylesConfig.StylishMarkdown.Categories[models.Category(val)][0])
 	}
-
+	changelogStr += fmt.Sprintf("\n[YANKED]: https://img.shields.io/badge/-YANKED-blueviolet.svg?&style=for-the-badge")
 	changelogStr += "\n"
 
 	return changelogStr
