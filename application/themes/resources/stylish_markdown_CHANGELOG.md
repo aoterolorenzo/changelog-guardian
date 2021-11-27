@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## ![Unreleased]
+## [![Unreleased]](https://release.link)
 
-## ![v1.0.0] ![2021-11-25]
+## [![v1.0.0]![2021-11-25]](https://unrelease.link)
 
 ### ![Added]
 
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 [!16](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/16) Fixed Gitlab provider tests ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!13](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/13) Fixed forcing specific bump type behaviour on release command ([@aoterocom](https://gitlab.com/aoterocom))
 
-## ![v0.1.0] ![2021-11-25]
+## [![v0.1.0]![2021-11-25]](https://release.link)
 
 ### ![Added]
 

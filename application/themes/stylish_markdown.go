@@ -16,7 +16,7 @@ import (
 )
 
 const stylishMarkdownTaskRegexp = `-\s[^\s]+\s\[(?P<taskName>[^]]+)?]\((?P<taskHref>[^)]+)?\)\s?(?P<taskTitle>[^@]+)?\s?\(?(@(?P<taskAuthor>[^]]+)?]\((?P<taskAuthorHref>[^)]+)\)\))?`
-const stylishMarkdownReleaseRegexp = `## \!\[(?P<releaseVersion>[^\]]+)](\s\!\[)?(?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2})?]?\(?(?P<releaseLink>[^)]+)?\)?(?P<releaseYanked> \!\[YANKED])?`
+const stylishMarkdownReleaseRegexp = `## \[\!\[(?P<releaseVersion>[^\]]+)](\s?\!\[)?(?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2})?]?]\(?(?P<releaseLink>[^)]+)?\)?(?P<releaseYanked> \!\[YANKED])?`
 const stylishMarkdownCategoryRegexp = `### \!\[(?P<category>.*)\]`
 const stylishMarkdownChangelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
 	"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
@@ -121,14 +121,14 @@ func (c *StylishMarkDownChangelogService) ReleaseToString(r models.Release) stri
 	}
 	var dateStr string
 	if r.Date != "" {
-		dateStr = " ![" + r.Date + "]"
+		dateStr = "![" + r.Date + "]"
 	}
 
 	if strings.ToUpper(r.Version) == "Unreleased" {
 		dateStr = ""
 	}
 
-	releaseStr := fmt.Sprintf("\n## ![%s]%s%s", r.Version, dateStr, yankedStr)
+	releaseStr := fmt.Sprintf("\n## [![%s]%s](%s)%s", r.Version, dateStr, r.Link, yankedStr)
 	releaseStr += "\n"
 
 	keys := make([]string, 0, len(r.Sections))
@@ -211,7 +211,7 @@ func (c *StylishMarkDownChangelogService) parseRelease(line string, fullChangelo
 	}
 	r.Version = paramsMap["releaseVersion"]
 	r.Date = paramsMap["releaseDate"]
-	r.Link = paramsMap["releaseDate"]
+	r.Link = paramsMap["releaseLink"]
 	if paramsMap["releaseYanked"] != "" {
 		r.Yanked = true
 	}
