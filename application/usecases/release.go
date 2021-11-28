@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
@@ -153,4 +155,8 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 
 	Log.Infof("Changelog saved\n")
+
+	if Log.GetLevel() <= log.ErrorLevel {
+		fmt.Println(nextVersion)
+	}
 }
