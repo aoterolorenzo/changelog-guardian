@@ -1,4 +1,4 @@
-package themes
+package templates
 
 import (
 	"gitlab.com/aoterocom/changelog-guardian/application/models"

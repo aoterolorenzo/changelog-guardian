@@ -14,10 +14,10 @@ func YankCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Preparing execution...\n")
 	argTemplate := cmd.Flag("template").Value.String()
 	if argTemplate != "" {
-		Settings.Style = argTemplate
+		Settings.Template = argTemplate
 	}
-	Log.Debugf("Using %s template\n", Settings.Style)
-	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
+	Log.Debugf("Using %s template\n", Settings.Template)
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
 		panic(err)
 	}

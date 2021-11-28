@@ -1,4 +1,4 @@
-package themes
+package templates
 
 import (
 	"github.com/magiconair/properties/assert"
