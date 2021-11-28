@@ -18,6 +18,6 @@ release (or unrelease it no more releases are present.`,
 }
 
 func init() {
-	regularCmd.AddCommand(yankCmd)
+	RegularCmd.AddCommand(yankCmd)
 	yankCmd.Flags().StringP("version", "v", "", "Version to yank")
 }

@@ -17,7 +17,7 @@ defining the type of bum following Semantic Versioning specification'`,
 }
 
 func init() {
-	regularCmd.AddCommand(releaseCmd)
+	RegularCmd.AddCommand(releaseCmd)
 
 	releaseCmd.Flags().BoolP("patch", "p", false, "Patch Release")
 	releaseCmd.Flags().BoolP("minor", "m", false, "Minor Release")

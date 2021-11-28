@@ -12,8 +12,8 @@ import (
 
 var cfgFile string
 
-// regularCmd represents the base command when called without any subcommands
-var regularCmd = &cobra.Command{
+// RegularCmd represents the base command when called without any subcommands
+var RegularCmd = &cobra.Command{
 	Use:   "Changelog Guardian",
 	Short: "Keep you're changelog safe",
 	Long:  `Keep you're changelog safe and punish those who dare to manually edit it`,
@@ -24,13 +24,13 @@ var regularCmd = &cobra.Command{
 }
 
 func Execute() {
-	cobra.CheckErr(regularCmd.Execute())
+	cobra.CheckErr(RegularCmd.Execute())
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	regularCmd.PersistentFlags().String("template", "", "CHANGELOG template")
-	regularCmd.PersistentFlags().String("output-template", "", "Output CHANGELOG template")
+	RegularCmd.PersistentFlags().String("template", "", "CHANGELOG template")
+	RegularCmd.PersistentFlags().String("output-template", "", "Output CHANGELOG template")
 }
 
 func initConfig() {
