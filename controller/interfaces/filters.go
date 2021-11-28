@@ -5,9 +5,9 @@ import (
 )
 
 type ReleasePipe interface {
-	Pipe(release *infra.Release) (*infra.Release, bool, error)
+	Filter(release *infra.Release) (*infra.Release, bool, error)
 }
 
-type TaskPipe interface {
-	Pipe(task *infra.Task) (*infra.Task, bool, error)
+type TasksPipe interface {
+	Filter(task *infra.Task) (*infra.Task, bool, error)
 }

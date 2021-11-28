@@ -46,7 +46,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 			panic(err)
 		}
 
-		cgController, err := controllers.NewChangelogGuardianController(nil, *tasksProvider, Settings.ReleasePipes, Settings.TaskPipes)
+		cgController, err := controllers.NewChangelogGuardianController(nil, *tasksProvider, Settings.ReleasePipes, Settings.TasksPipes)
 		if err != nil {
 			panic(err)
 		}

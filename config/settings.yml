@@ -20,7 +20,17 @@ providers:
 releaseProvider: git
 tasksProvider: git
 releasePipes: [ 'semver' ]
-taskPipes: []
+tasksPipes: [ 'conventional_commits' ]
+tasksPipesCfg:
+  conventional_commits:
+    categories:
+      Breaking Changes: breaking
+      Added: feat
+      Changed: perf
+      Refactor: refactor
+      Fixed: fix
+      Removed: revert
+      Documentation: docs
 initialVersion: 0.1.0
 stylesCfg:
   stylish_markdown:

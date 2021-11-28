@@ -1,4 +1,4 @@
-package middleware
+package pipes
 
 import (
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGitlabResolverTaskPipe_Pipe(t *testing.T) {
+func TestGitlabResolverTasksPipe_Filter(t *testing.T) {
 	type args struct {
 		task *infra.Task
 	}
@@ -34,33 +34,33 @@ func TestGitlabResolverTaskPipe_Pipe(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tf := &GitlabResolverTaskPipe{}
-			got, got1, err := tf.Pipe(tt.args.task)
+			tf := &GitlabResolverTasksPipe{}
+			got, got1, err := tf.Filter(tt.args.task)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Pipe() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Filter() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Pipe() got = %v, want %v", got, tt.want)
+				t.Errorf("Filter() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("Pipe() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("Filter() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
 }
 
-func TestNewGitlabResolverTaskPipe(t *testing.T) {
+func TestNewGitlabResolverTasksPipe(t *testing.T) {
 	tests := []struct {
 		name string
-		want *GitlabResolverTaskPipe
+		want *GitlabResolverTasksPipe
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewGitlabResolverTaskPipe(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewGitlabResolverTaskPipe() = %v, want %v", got, tt.want)
+			if got := NewGitlabResolverTasksPipe(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewGitlabResolverTasksPipe() = %v, want %v", got, tt.want)
 			}
 		})
 	}

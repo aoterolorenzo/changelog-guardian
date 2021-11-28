@@ -35,7 +35,7 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 		panic(err)
 	}
 
-	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleasePipes, Settings.TaskPipes)
+	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleasePipes, Settings.TasksPipes)
 	if err != nil {
 		panic(err)
 	}

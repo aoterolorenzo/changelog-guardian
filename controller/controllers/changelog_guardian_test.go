@@ -52,9 +52,9 @@ func TestChangelogGuardianController_throughReleasePipes(t *testing.T) {
 	}
 }
 
-func TestChangelogGuardianController_throughTaskPipes(t *testing.T) {
+func TestChangelogGuardianController_throughTasksPipes(t *testing.T) {
 	type fields struct {
-		taskPipes []interfaces2.TaskPipe
+		tasksPipes []interfaces2.TasksPipe
 	}
 	type args struct {
 		tasks []infra.Task
@@ -67,10 +67,10 @@ func TestChangelogGuardianController_throughTaskPipes(t *testing.T) {
 	}{
 		{
 			name: "Test task pipeing",
-			fields: fields{taskPipes: []interfaces2.TaskPipe{
+			fields: fields{tasksPipes: []interfaces2.TasksPipe{
 				// Need to go in reverse order!!
-				interfaces2.TaskPipe(&middleware2.NaturalLanguageTaskPipe{}),
-				interfaces2.TaskPipe(&middleware2.GitlabResolverTaskPipe{}),
+				interfaces2.TasksPipe(&middleware2.NaturalLanguageTasksPipe{}),
+				interfaces2.TasksPipe(&middleware2.GitlabResolverTasksPipe{}),
 			}},
 			args: args{
 				tasks: []infra.Task{
@@ -91,10 +91,10 @@ func TestChangelogGuardianController_throughTaskPipes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cgc := &ChangelogGuardianController{
-				taskPipes: tt.fields.taskPipes,
+				tasksPipes: tt.fields.tasksPipes,
 			}
-			if got := cgc.throughTaskPipes(tt.args.tasks); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("throughTaskPipes() = %v, want %v", got, tt.want)
+			if got := cgc.throughTasksPipes(tt.args.tasks); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("throughTasksPipes() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -29,10 +29,15 @@ type GlobalSettings struct {
 	ReleaseProvider string   `yaml:"releaseProvider"`
 	TasksProvider   string   `yaml:"tasksProvider"`
 	ReleasePipes    []string `yaml:"releasePipes"`
-	TaskPipes       []string `yaml:"taskPipes"`
-	InitialVersion  string   `yaml:"initialVersion"`
-	Style           string   `yaml:"style"`
-	StylesConfig    struct {
+	TasksPipes      []string `yaml:"tasksPipes"`
+	TasksPipesCfg   struct {
+		ConventionalCommits struct {
+			Categories map[models.Category]string `yaml:"categories"`
+		} `yaml:"conventional_commits"`
+	} `yaml:"tasksPipesCfg"`
+	InitialVersion string `yaml:"initialVersion"`
+	Style          string `yaml:"style"`
+	StylesConfig   struct {
 		StylishMarkdown struct {
 			Categories map[models.Category][]string `yaml:"categories"`
 		} `yaml:"stylish_markdown"`

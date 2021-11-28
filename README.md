@@ -44,11 +44,21 @@ releaseProvider: git # Release provider
 tasksProvider: git # Tasks provider
 style: markdown # Changelog style (theming)
 releasePipes: [ 'semver' ] # Release pipes
-taskPipes: [] # Task pipes
+tasksPipes: [] # Task pipes
+tasksPipesCfg:
+  conventional_commits:
+    categories: # Associates Categories with Conventional Commits types
+      Breaking Changes: breaking
+      Added: feat
+      Changed: perf
+      Refactor: refactor
+      Fixed: fix
+      Removed: revert
+      Documentation: docs
 initialVersion: 0.1.0 # Initial version for generating an initial release
 stylesCfg:
   stylish_markdown:
-    categories: // Selects a color and an emoji for Categories on template generated CHANGELOG's
+    categories: # Selects a color and an emoji for Categories on template generated CHANGELOG's
       Breaking Changes: ['f70000','🚨']
       Added: ['5ccb31','✨']
       Changed: ['31cb7d','✒️']
@@ -95,7 +105,7 @@ The pipes can be combined and Changelog Guardian will make each release/task go 
 For example, using the `gitlab_resolver` and the `natural_language` task pipes simultaneously
 
 ```yml
-taskPipes: [ 'gitlab_resolver', 'natural_language']
+tasksPipes: [ 'gitlab_resolver', 'natural_language']
 ```
 
 will result in something like:
@@ -124,9 +134,9 @@ Some examples:
 `Fix new provider` -> `Fixed new provider`
 `Refactor new provider` -> `Refactorized new provider`
 
-#### Conventional Commits task pipe (WIP)
+#### Conventional Commits task pipe
 
-This pipe will filter your tasks (mostly for using with the Git task provider) following [Conventional Commits](https://www.conventionalcommits.org/) specification, and appending them to your changelog sections depending on the commit type and scope.
+This pipe filters your tasks (mostly for using with the Git task provider) following [Conventional Commits](https://www.conventionalcommits.org/) specification, and appending them to your changelog sections depending on the commit type.
 
 
 ### Changelog Styles
