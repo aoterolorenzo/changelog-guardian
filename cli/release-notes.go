@@ -17,7 +17,7 @@ var releaseNotesCmd = &cobra.Command{
 }
 
 func init() {
-	regularCmd.AddCommand(releaseNotesCmd)
+	RegularCmd.AddCommand(releaseNotesCmd)
 	releaseNotesCmd.Flags().StringP("version", "v", "", "Version")
 	releaseNotesCmd.Flags().StringP("output-file", "o", "", "Output file")
 	releaseNotesCmd.Flags().BoolP("echo", "e", false, "Echo Release Notes on screen")
