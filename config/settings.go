@@ -34,6 +34,16 @@ type GlobalSettings struct {
 		ConventionalCommits struct {
 			Categories map[models.Category]string `yaml:"categories"`
 		} `yaml:"conventional_commits"`
+		InclusionsExclusions struct {
+			Labels struct {
+				Inclusions []string
+				Exclusions []string
+			} `yaml:"labels"`
+			Paths struct {
+				Inclusions []string
+				Exclusions []string
+			} `yaml:"paths"`
+		} `yaml:"inclusions_exclusions"`
 	} `yaml:"tasksPipesCfg"`
 	InitialVersion  string `yaml:"initialVersion"`
 	Template        string `yaml:"template"`

@@ -33,7 +33,7 @@ func (tf *ConventionalCommitsTasksPipe) Filter(task *infra.Task) (*infra.Task, b
 			for key, val := range settings.Settings.TasksPipesCfg.ConventionalCommits.Categories {
 				if paramsMap["type"] == val {
 					task.Category = key
-					break
+					return task, true, nil
 				}
 			}
 		}

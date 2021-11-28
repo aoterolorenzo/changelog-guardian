@@ -31,6 +31,13 @@ tasksPipesCfg:
       Fixed: fix
       Removed: revert
       Documentation: docs
+  inclusions_exclusions:
+    labels:
+      excluded: [ 'internal' ]
+      included: [ '*all' ]
+    paths:
+      excluded: [ ]
+      included: [ '*all' ]
 initialVersion: 0.1.0
 templatesCfg:
   stylish_markdown:

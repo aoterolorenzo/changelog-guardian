@@ -5,10 +5,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	"strconv"
 	"strings"
 )
