@@ -42,7 +42,7 @@ providers: # Internal configuration of the Changelog Guardian providers
       Security: kind::security
 releaseProvider: git # Release provider
 tasksProvider: git # Tasks provider
-style: markdown # Changelog style (theming)
+template: markdown # Changelog template (theming)
 releasePipes: [ 'semver' ] # Release pipes
 tasksPipes: [] # Task pipes
 tasksPipesCfg:
@@ -56,7 +56,7 @@ tasksPipesCfg:
       Removed: revert
       Documentation: docs
 initialVersion: 0.1.0 # Initial version for generating an initial release
-stylesCfg:
+templatesCfg:
   stylish_markdown:
     categories: # Selects a color and an emoji for Categories on template generated CHANGELOG's
       Breaking Changes: ['f70000','🚨']
@@ -139,23 +139,23 @@ Some examples:
 This pipe filters your tasks (mostly for using with the Git task provider) following [Conventional Commits](https://www.conventionalcommits.org/) specification, and appending them to your changelog sections depending on the commit type.
 
 
-### Changelog Styles
+### Changelog Templates
 
-Maybe you would like to maintain a Changelog fed with some emojis. Or perhaps you want to generate a CHANGELOG.adoc in asciidoc. Changelog Styles are meant for exactly cover this ~~whims~~ needs.
+Maybe you would like to maintain a Changelog fed with some emojis. Or perhaps you want to generate a CHANGELOG.adoc in asciidoc. Changelog Templates are meant for exactly cover this ~~whims~~ needs.
 
-#### Markdown Style
+#### Markdown Template
 
-Default Changelog Style. 
+Default Changelog Template. 
 Follows the [Keep A Changelog](https://keepachangelog.com/en/1.1.0/#how) specification.
 
-Style code: `markdown`
+Template code: `markdown`
 
-#### Stylish Markdown Style
+#### Stylish Markdown Template
 
-Markdown Style fed with some emojis and badges. 
+Markdown Template fed with some emojis and badges. 
 Follows the [Keep A Changelog](https://keepachangelog.com/en/1.1.0/#how) specification.
 
-Style code: `stylish_markdown`
+Template code: `stylish_markdown`
 
 ## Usage
 

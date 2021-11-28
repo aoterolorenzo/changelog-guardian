@@ -3,7 +3,7 @@ releaseNotesPath: ./RELEASE-NOTES.md
 mainBranch: main
 defaultBranch: develop
 cgConfigPath: .cg-config.yml
-style: markdown
+template: markdown
 providers:
   gitlab:
     labels:
@@ -32,7 +32,7 @@ tasksPipesCfg:
       Removed: revert
       Documentation: docs
 initialVersion: 0.1.0
-stylesCfg:
+templatesCfg:
   stylish_markdown:
     categories:
       Breaking Changes: ['f70000','🚨']

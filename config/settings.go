@@ -35,13 +35,13 @@ type GlobalSettings struct {
 			Categories map[models.Category]string `yaml:"categories"`
 		} `yaml:"conventional_commits"`
 	} `yaml:"tasksPipesCfg"`
-	InitialVersion string `yaml:"initialVersion"`
-	Style          string `yaml:"style"`
-	StylesConfig   struct {
+	InitialVersion  string `yaml:"initialVersion"`
+	Template        string `yaml:"template"`
+	TemplatesConfig struct {
 		StylishMarkdown struct {
 			Categories map[models.Category][]string `yaml:"categories"`
 		} `yaml:"stylish_markdown"`
-	} `yaml:"stylesCfg"`
+	} `yaml:"templatesCfg"`
 }
 
 func init() {

@@ -1,3 +1,4 @@
 releaseProvider: gitlab
 tasksProvider: gitlab
-taskPipes: [ 'gitlab_resolver', 'natural_language' ]
+style: stylish_markdown
+tasksPipes: [ 'gitlab_resolver', 'natural_language' ]

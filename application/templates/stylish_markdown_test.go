@@ -1,4 +1,4 @@
-package themes
+package templates
 
 import (
 	_ "embed"

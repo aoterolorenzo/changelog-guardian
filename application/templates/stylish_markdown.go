@@ -1,4 +1,4 @@
-package themes
+package templates
 
 import (
 	"bufio"
@@ -97,14 +97,14 @@ func (c *StylishMarkDownChangelogService) NudeChangelogString(changelog models.C
 		}
 	}
 
-	keys := make([]string, 0, len(settings.Settings.StylesConfig.StylishMarkdown.Categories))
-	for k := range settings.Settings.StylesConfig.StylishMarkdown.Categories {
+	keys := make([]string, 0, len(settings.Settings.TemplatesConfig.StylishMarkdown.Categories))
+	for k := range settings.Settings.TemplatesConfig.StylishMarkdown.Categories {
 		keys = append(keys, string(k))
 	}
 	sort.Strings(keys)
 
 	for _, val := range keys {
-		changelogStr += fmt.Sprintf("\n[%s]: https://img.shields.io/badge/-%s-%s.svg?&style=flat-square", val, url.QueryEscape(strings.ToUpper(string(val))), settings.Settings.StylesConfig.StylishMarkdown.Categories[models.Category(val)][0])
+		changelogStr += fmt.Sprintf("\n[%s]: https://img.shields.io/badge/-%s-%s.svg?&style=flat-square", val, url.QueryEscape(strings.ToUpper(string(val))), settings.Settings.TemplatesConfig.StylishMarkdown.Categories[models.Category(val)][0])
 	}
 	changelogStr += fmt.Sprintf("\n[YANKED]: https://img.shields.io/badge/-YANKED-blueviolet.svg?&style=for-the-badge")
 	changelogStr += "\n"
@@ -153,7 +153,7 @@ func (c *StylishMarkDownChangelogService) TaskToString(t models.Task, category m
 		authorString = fmt.Sprintf(" ([@%s](%s))", t.Author, t.AuthorHref)
 	}
 
-	var categoryEmoji = settings.Settings.StylesConfig.StylishMarkdown.Categories[category][1]
+	var categoryEmoji = settings.Settings.TemplatesConfig.StylishMarkdown.Categories[category][1]
 
 	return fmt.Sprintf("- %s [%s](%s) %s%s", categoryEmoji, t.ID, t.Href, t.Title, authorString)
 }

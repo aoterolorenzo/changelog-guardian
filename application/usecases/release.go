@@ -17,9 +17,9 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 	argTemplate := cmd.Flag("template").Value.String()
 	if argTemplate != "" {
-		Settings.Style = argTemplate
+		Settings.Template = argTemplate
 	}
-	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Style)
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
 		panic(err)
 	}
