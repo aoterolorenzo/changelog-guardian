@@ -1,8 +1,8 @@
 package services
 
 import (
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 )
 
 type ChangelogMixer struct {

@@ -30,3 +30,12 @@ func SaveStringToFile(filePath string, str string) error {
 
 	return nil
 }
+
+func SliceContainsString(slice []string, str string) bool {
+	for _, a := range slice {
+		if a == str {
+			return true
+		}
+	}
+	return false
+}

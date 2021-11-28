@@ -2,11 +2,11 @@ package usecases
 
 import (
 	"github.com/spf13/cobra"
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	"strconv"
 	"time"
 )

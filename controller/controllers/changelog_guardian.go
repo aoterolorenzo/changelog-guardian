@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	services2 "gitlab.com/aoterocom/changelog-guardian/application/services"
 	"gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
 	"gitlab.com/aoterocom/changelog-guardian/controller/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/controller/services"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"strconv"

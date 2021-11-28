@@ -1,12 +1,13 @@
 package pipes
 
 import (
+	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"reflect"
 	"testing"
 )
 
-func TestGitlabResolverTasksPipe_Filter(t *testing.T) {
+func TestConventionalCommitsTasksPipe_Filter(t *testing.T) {
 	type args struct {
 		task *infra.Task
 	}
@@ -18,23 +19,30 @@ func TestGitlabResolverTasksPipe_Filter(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "Test Gitlab Resolver pipe with an accepted task",
-			args:    args{task: &infra.Task{Title: "Resolve \"Add new feature\""}},
-			want:    &infra.Task{Title: "Add new feature"},
+			name:    "Conventional commit feat (Added)",
+			args:    args{task: &infra.Task{Title: "feat: feature cc message"}},
+			want:    &infra.Task{Title: "feat: feature cc message", Category: models.ADDED},
 			want1:   true,
 			wantErr: false,
 		},
 		{
-			name:    "Test Gitlab Resolver pipe with a non accepted task",
-			args:    args{task: &infra.Task{Title: "Rare verb new feature"}},
-			want:    &infra.Task{Title: "Rare verb new feature"},
-			want1:   false,
+			name:    "Conventional commit feat (Fixed)",
+			args:    args{task: &infra.Task{Title: "fix: feature cc message"}},
+			want:    &infra.Task{Title: "fix: feature cc message", Category: models.FIXED},
+			want1:   true,
+			wantErr: false,
+		},
+		{
+			name:    "Not Conventional commit",
+			args:    args{task: &infra.Task{Title: "Non cc feature"}},
+			want:    nil,
+			want1:   true,
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tf := &GitlabResolverTasksPipe{}
+			tf := &ConventionalCommitsTasksPipe{}
 			got, got1, err := tf.Filter(tt.args.task)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Filter() error = %v, wantErr %v", err, tt.wantErr)
