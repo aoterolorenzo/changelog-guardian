@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestSemverReleasePipe_Pipe(t *testing.T) {
+func TestSemverReleasePipe_Filter(t *testing.T) {
 	type args struct {
 		release *infra.Release
 	}
@@ -34,16 +34,16 @@ func TestSemverReleasePipe_Pipe(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			nlm := &SemverReleasePipe{}
-			got, got1, err := nlm.Pipe(tt.args.release)
+			got, got1, err := nlm.Filter(tt.args.release)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Pipe() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Filter() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Pipe() got = %v, want %v", got, tt.want)
+				t.Errorf("Filter() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("Pipe() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("Filter() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
