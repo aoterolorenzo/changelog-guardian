@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [Unreleased]
 
 ## [3.12.0] - 2021-04-27
 
@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#140](https://github.com/inditex/changelog-drafter/issues/140) Document label configuration and category support
 - [#130](https://github.com/inditex/changelog-drafter/issues/130) Improve authentication docs
 
-[UNRELEASED]: (https:/link/)
+[Unreleased]: (https:/link/)
 [3.12.0]: (https:/link/)
 [3.11.5]: (https:/link/)
 [3.11.4]: (https:/link/)

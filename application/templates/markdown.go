@@ -109,7 +109,7 @@ func (c *MarkDownChangelogService) ReleaseToString(r models.Release) string {
 		dateStr = " - " + r.Date
 	}
 
-	if strings.ToUpper(r.Version) == "UNRELEASED" {
+	if strings.ToUpper(r.Version) == "Unreleased" {
 		dateStr = ""
 	}
 
