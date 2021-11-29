@@ -12,6 +12,7 @@ var releaseNotesCmd = &cobra.Command{
 	Short: "Print version release notes",
 	Long:  `Print the release notes of the last or given version.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		PreCommandChecks(cmd, args)
 		usecases.ReleaseNotesCmd(cmd, args)
 	},
 }
