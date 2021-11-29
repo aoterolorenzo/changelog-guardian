@@ -117,7 +117,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 	Log.Infof("Preparing Changelog with Release %s\n", nextVersion)
 
-	// Convert UNRELEASED to nextVersion and add new UNRELEASE section
+	// Convert Unreleased to nextVersion and add new UNRELEASE section
 	unreleased := &changelog.Releases[0]
 	unreleased.Version = nextVersion
 
@@ -142,7 +142,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 	helpers.ReverseAny(changelog.Releases)
 	newUnreleasedURL, err := (*releaseProvider).ReleaseURL(&unreleased.Version, Settings.DevelopBranch)
-	changelog.Releases = append(changelog.Releases, *models.NewRelease("UNRELEASED", "", *newUnreleasedURL, false, nil))
+	changelog.Releases = append(changelog.Releases, *models.NewRelease("Unreleased", "", *newUnreleasedURL, false, nil))
 	helpers.ReverseAny(changelog.Releases)
 
 	argOutputTemplate := cmd.Flag("output-template").Value.String()
@@ -157,6 +157,6 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	Log.Infof("Changelog saved\n")
 
 	if Log.GetLevel() <= log.ErrorLevel {
-		fmt.Println(nextVersion)
+		fmt.Printf("%s", nextVersion)
 	}
 }

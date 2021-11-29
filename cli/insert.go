@@ -10,7 +10,7 @@ import (
 var insertCmd = &cobra.Command{
 	Use:   "insert",
 	Short: "Inserts a task in CHANGELOG",
-	Long: `Inserts a new task in the UNRELEASED section of
+	Long: `Inserts a new task in the Unreleased section of
 the CHANGELOG'`,
 	Run: func(cmd *cobra.Command, args []string) {
 		PreCommandChecks(cmd, args)

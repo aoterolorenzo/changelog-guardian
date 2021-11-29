@@ -105,7 +105,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 			timeTo = nil
 		}
 
-		// If next release doesn't exist (UNRELEASED has not next), set to there
+		// If next release doesn't exist (Unreleased has not next), set to there
 		var releaseFrom infra.Release
 		var timeFrom *time.Time
 		if i != len(infraTruncatedReleases)-1 {
