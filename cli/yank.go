@@ -13,6 +13,7 @@ var yankCmd = &cobra.Command{
 	Long: `Yank a release and move its tasks to the immediately after 
 release (or unrelease it no more releases are present.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		PreCommandChecks(cmd, args)
 		usecases.YankCmd(cmd, args)
 	},
 }

@@ -12,6 +12,7 @@ var calculateReleaseCmd = &cobra.Command{
 	Long: `Calculates next release version
 defining the type of bum following Semantic Versioning specification'`,
 	Run: func(cmd *cobra.Command, args []string) {
+		PreCommandChecks(cmd, args)
 		usecases.CalculateReleaseCmd(cmd, args)
 	},
 }

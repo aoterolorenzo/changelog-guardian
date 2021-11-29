@@ -12,6 +12,7 @@ var releaseCmd = &cobra.Command{
 	Long: `Generates a new Release on the CHANGELOG
 defining the type of bum following Semantic Versioning specification'`,
 	Run: func(cmd *cobra.Command, args []string) {
+		PreCommandChecks(cmd, args)
 		usecases.ReleaseCmd(cmd, args)
 	},
 }
