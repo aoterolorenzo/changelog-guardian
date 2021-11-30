@@ -20,6 +20,7 @@ release:
     - go run main.go release --silent > VERSION
     - git branch release/$(cat VERSION)
     - git checkout release/$(cat VERSION)
+    - git pull origin/main
     - git merge origin/main
     - git add VERSION CHANGELOG.md
     - git commit -m "[AUTOMATED] Release $(cat VERSION)"
