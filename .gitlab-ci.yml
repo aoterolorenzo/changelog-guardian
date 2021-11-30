@@ -21,6 +21,7 @@ release:
     - go get $(go list ./... | grep -v /vendor/)
     - go run main.go release --silent > VERSION
     - git branch release/$(cat VERSION)
+    - git add VERSION CHANGELOG.md
     - git commit -m "Release $(cat VERSION)"
     - git push
     - git push -o merge_request.create -o merge_request.target=main -o merge_request.title="Release $(cat VERSION)"
