@@ -16,7 +16,6 @@ release:
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
-    - git config commit.gpgsign true
     - go get $(go list ./... | grep -v /vendor/)
     - go run main.go release --silent > VERSION
     - git branch release/$(cat VERSION)
