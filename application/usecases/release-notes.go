@@ -30,7 +30,7 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting template\n")
 	}
 
 	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
@@ -80,7 +80,7 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 
 				err = helpers.SaveStringToFile(Settings.ReleaseNotesPath, releaseNotes)
 				if err != nil {
-					panic(err)
+					Log.Fatalf("Error saving changelog file on %s\n", Settings.ReleaseNotesPath)
 				}
 
 				Log.Infof("Release Notes saved on %s\n", Settings.ReleaseNotesPath)

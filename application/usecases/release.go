@@ -23,7 +23,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting template\n")
 	}
 
 	// Load args:
@@ -123,7 +123,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting release provider\n")
 	}
 	var from *string
 	if lastRelease == nil {
@@ -133,7 +133,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 	url, err := (*releaseProvider).ReleaseURL(from, nextVersion)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error retrieving release url\n")
 	}
 	unreleased.Link = *url
 	unreleased.Date = time.Now().Format("2006-01-02")
@@ -151,7 +151,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 	err = (*changelogService).SaveChangelog(*changelog, Settings.ChangelogPath)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error saving changelog file\n")
 	}
 
 	Log.Infof("Changelog saved\n")
