@@ -16,8 +16,8 @@ release:
   script:
     - git log
     - echo "$GIT_PGP_KEY" | gpg --import
-    - git config user.name $GIT_USERNAME
-    - git config user.email $GIT_EMAIL
+    - git config user.name "$GIT_USERNAME"
+    - git config user.email "$GIT_EMAIL"
     - git config commit.gpgsign true
     - go run main.go release --silent > VERSION
     - git checkout release/$(cat VERSION)
