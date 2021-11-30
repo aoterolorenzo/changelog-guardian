@@ -19,7 +19,7 @@ func YankCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting template\n")
 	}
 
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
@@ -71,7 +71,7 @@ func YankCmd(cmd *cobra.Command, args []string) {
 	}
 	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error saving changelog file\n")
 	}
 
 	Log.Infof("Changelog saved\n")

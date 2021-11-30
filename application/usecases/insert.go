@@ -23,7 +23,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting template\n")
 	}
 	// Load args:
 	argTitle := cmd.Flag("title").Value.String()
@@ -43,12 +43,12 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 		Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
 		tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
 		if err != nil {
-			panic(err)
+			Log.Fatalf("Error selecting release provider\n")
 		}
 
 		cgController, err := controllers.NewChangelogGuardianController(nil, *tasksProvider, Settings.ReleasePipes, Settings.TasksPipes)
 		if err != nil {
-			panic(err)
+			Log.Fatalf("Error creating controller\n")
 		}
 
 		Log.Debugf("Retrieving task info from provider\n")
@@ -62,7 +62,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		panic(err)
+		Log.Fatalf("Error retrieving changelog file\n")
 	}
 
 	task := models.NewTask(argId, argId, argLink, argTitle, argAuthor, argAuthorLink, models.Category(argCategory))
