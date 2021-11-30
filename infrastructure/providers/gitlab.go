@@ -36,16 +36,10 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(*currentGitBAseUrl)
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
-	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
-	fmt.Println(namespacedRepoSlice)
-	var namespacedRepo string
-	if len(namespacedRepoSlice) > 1 {
-		namespacedRepo = namespacedRepoSlice[1]
-	} else {
-		Log.Fatalf("Error retrieving Gitlab repository from git origin")
-	}
+	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
 	project, _, err := gitlabClient.Projects.GetProject(namespacedRepo, &gitlab.GetProjectOptions{})
@@ -88,7 +82,6 @@ func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(currentGitBAseUrl)
 
 	gitlabProjectName := strings.Replace(*currentGitBAseUrl, "https://gitlab.com/", "", 1)
 	gitlabProjectName = strings.Replace(gitlabProjectName, ".git", "", 1)
@@ -209,15 +202,7 @@ func (gp *GitlabProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 	}
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
-	fmt.Println(currentGitBAseUrl)
-	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
-	fmt.Println(namespacedRepoSlice)
-	var namespacedRepo string
-	if len(namespacedRepoSlice) > 1 {
-		namespacedRepo = namespacedRepoSlice[1]
-	} else {
-		Log.Fatalf("Error retrieving Gitlab repository from git origin")
-	}
+	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
 	project, _, err := gitlabClient.Projects.GetProject(namespacedRepo, &gitlab.GetProjectOptions{})
