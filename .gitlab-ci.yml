@@ -1,8 +1,6 @@
 image: golang:1.17.3
 
 stages:
-  - test
-  - build
   - release
 
 variables:
@@ -13,22 +11,6 @@ before_script:
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
 
-
-format:
-  stage: test
-  script:
-    - go fmt $(go list ./... | grep -v /vendor/)
-    - go vet $(go list ./... | grep -v /vendor/)
-    - go test -race $(go list ./... | grep -v /vendor/)
-
-
-
-compile:
-  stage: build
-  script:
-    - go build -race -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/main
-
-
 release:
   stage: release
   script:
@@ -36,6 +18,7 @@ release:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
     - git config commit.gpgsign true
+    - go build -race -ldflags "-extldflags '-static'" -o changelog-guardian
     - changelog-guardian release --silent > VERSION
     - git checkout release/$(cat VERSION)
     - git commit -m “Release $(cat VERSION)”
