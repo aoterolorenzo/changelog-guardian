@@ -11,9 +11,10 @@ before_script:
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
 
-format:
+release:
   stage: testRelease
   script:
+    git log
     echo "$GIT_PGP_KEY" | gpg --import
     git config user.name $GIT_USERNAME
     git config user.email $GIT_EMAIL
