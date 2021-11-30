@@ -21,5 +21,5 @@ release:
     - git branch release/$(cat VERSION)
     - git add VERSION CHANGELOG.md
     - git commit -m "Release $(cat VERSION)"
-    - git push
+    -  git push origin HEAD:release/$(cat VERSION)
     - git push -o merge_request.create -o merge_request.target=main -o merge_request.title="Release $(cat VERSION)"
