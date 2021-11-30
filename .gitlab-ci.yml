@@ -11,11 +11,20 @@ before_script:
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
 
+
+format:
+  stage: testRelease
+  script:
+    - go fmt $(go list ./... | grep -v /vendor/)
+    - go vet $(go list ./... | grep -v /vendor/)
+    - go test -race $(go list ./... | grep -v /vendor/)
+
+
 release:
   stage: testRelease
   script:
-    - git log
     - echo "$GIT_PGP_KEY" | gpg --import
+    - echo "$GIT_USERNAME"
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
     - git config commit.gpgsign true
