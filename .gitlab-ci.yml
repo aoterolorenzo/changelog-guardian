@@ -23,9 +23,10 @@ release:
     - git add VERSION CHANGELOG.md
     - git commit -m "[AUTOMATED] Release $(cat VERSION)"
     - go run main.go release-notes
+    - RELEASE_NOTES=$(sed -z 's/\n/<br>/g' RELEASE-NOTES.md)
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
       -o merge_request.create -o merge_request.target=main -o merge_request.title="Release $(cat VERSION)"
-      -o merge_request.description=$(sed -z 's/\n/<br>/g' RELEASE-NOTES.md)
+      -o merge_request.description="$RELEASE_NOTES"
   only:
     - merge_requests
     - develop
