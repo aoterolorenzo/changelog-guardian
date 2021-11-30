@@ -6,10 +6,10 @@ Changelog Guardian is the tool that will help you to keep your Changelog safely 
 
 ## Installation
 
-Use [Go Binaries](https://gobinaries.com/) to automatically compile, retrieve and install.
+We provide a INSTALL.sh file that identifies your SO and architecture, and directly downloads and installs the specific `changelog-guardian` binary into your /usr/local/bin for the latest version available.
 
 ```bash
-curl -sf https://gobinaries.com/aoterolorenzo/changelog-guardian | sh
+curl -sf https://gitlab.com/aoterocom/changelog-guardian/-/raw/main/INSTALL.sh | sh
 ```
 
 ## Configuration
@@ -55,6 +55,13 @@ tasksPipesCfg:
       Fixed: fix
       Removed: revert
       Documentation: docs
+  inclusions_exclusions:
+    labels:
+      excluded: [ 'internal' ]
+      included: [ '*all' ]
+    paths:
+      excluded: [ ]
+      included: [ '*all' ]
 initialVersion: 0.1.0 # Initial version for generating an initial release
 templatesCfg:
   stylish_markdown:
@@ -118,21 +125,28 @@ Filter the releases and allows only those which matches Semantic Versioning nome
 
 Pipe code: `semver`
 
-#### Gitlab Resolver task Pipe
+#### Gitlab Resolver tasks Pipe
 
 Automatic Gitlab Merge Request merge with a message of the kind `Resolve "Issue tittle"`. This pipe modifies the task title to match only `Issue title`
 
 For example: `Resolve "Add new provider"` -> `Add new provider`
 
-#### Natural Language task Pipe
+#### Natural Language tasks Pipe
 
 Usually we name our tasks on an infinitive voice: `Add new feature`. This pipe will filter the task names and will replace some of the most frequently used verbs with a past voice.
 
-Some examples: 
+Some examples:
 
 `Add new provider` -> `Added new provider`
 `Fix new provider` -> `Fixed new provider`
 `Refactor new provider` -> `Refactorized new provider`
+
+#### Inclusions&Exclusions tasks pipe
+
+Need to exclude or include only certain labels or paths that tasks must address? With this pipe you can do it
+
+Take a look at the custom configuration section to see the specific configuration to make it happen.
+PS: For inclusions, you can use the `*all` wildcard to allow all files/paths.
 
 #### Conventional Commits task pipe
 
