@@ -23,5 +23,4 @@ format:
     git checkout release/$(cat VERSION)
     git commit -m “Release $(cat VERSION)”
     cat VERSION
-    #git tag v$(cat VERSION)
     git push
