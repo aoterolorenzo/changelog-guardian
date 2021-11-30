@@ -25,7 +25,7 @@ release:
     - go run main.go release-notes
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
       -o merge_request.create -o merge_request.target=main -o merge_request.title="Release $(cat VERSION)"
-      -o merge_request.description < RELEASE_NOTES.md
+      -o merge_request.description < RELEASE-NOTES.md
   only:
     - merge_requests
     - develop
