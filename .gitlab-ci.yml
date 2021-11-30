@@ -16,11 +16,11 @@ release:
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
-    - git remote get-url origin
     - go get $(go list ./... | grep -v /vendor/)
     - go run main.go release --silent > VERSION
     - git branch release/$(cat VERSION)
     - git checkout release/$(cat VERSION)
+    - git merge main
     - git add VERSION CHANGELOG.md
-    - git commit -m "Release $(cat VERSION)"
+    - git commit -m "[AUTOMATED] Release $(cat VERSION)"
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git -o merge_request.create -o merge_request.target=main -o merge_request.title="Release $(cat VERSION)"
