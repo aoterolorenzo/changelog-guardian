@@ -88,6 +88,7 @@ func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(currentGitBAseUrl)
 
 	gitlabProjectName := strings.Replace(*currentGitBAseUrl, "https://gitlab.com/", "", 1)
 	gitlabProjectName = strings.Replace(gitlabProjectName, ".git", "", 1)
@@ -208,6 +209,7 @@ func (gp *GitlabProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 	}
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
+	fmt.Println(currentGitBAseUrl)
 	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
 	fmt.Println(namespacedRepoSlice)
 	var namespacedRepo string
