@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/joho/godotenv"
 	"github.com/xanzy/go-gitlab"
@@ -38,6 +39,7 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
 	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
+	fmt.Println(namespacedRepoSlice)
 	var namespacedRepo string
 	if len(namespacedRepoSlice) > 1 {
 		namespacedRepo = namespacedRepoSlice[1]
@@ -207,6 +209,7 @@ func (gp *GitlabProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
 	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
+	fmt.Println(namespacedRepoSlice)
 	var namespacedRepo string
 	if len(namespacedRepoSlice) > 1 {
 		namespacedRepo = namespacedRepoSlice[1]
