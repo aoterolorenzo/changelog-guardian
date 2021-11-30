@@ -211,8 +211,15 @@ Usage:
 Flags:
  
   --template             CHANGELOG template
-  
+
   -h, --help             Prints help
+
+  Global Flags:
+      --changelog-path string    CHANGELOG path
+      --config string            Config file path
+      --output-template string   Output CHANGELOG template
+      --silent                   Logging level
+      --template string          CHANGELOG template
 ```
 
 ### Release
@@ -257,7 +264,7 @@ Usage:
 Flags:
   -i, --id string             Task ID
   -t, --title string          Task title
-    -l, --link string           Task link
+  -l, --link string           Task link
   -f, --author string         Task author
   -v, --authorLink string     Task author link
   -c, --category string       Task category (default "Added")
@@ -285,22 +292,43 @@ Flags:
   -h, --help             Prints help
 ```
 
-### Yank
+### Release Notes
 
 Generates the Release Notes for the last released version (or the one specified by the --version flag).
 
 ```bash
-$> changelog-guardian yank
+$> changelog-guardian release-notes
 ```
 
 ```
-  changelog-guardian yank [flags]
+  Usage:
+  Changelog release-notes [flags]
 
 Flags:
-  -v, --version string      Version to yank
+  -e, --echo                 Echo Release Notes on screen
+  -h, --help                 Prints help
   -o, --output-file string   Output file
-  -e, --echo                Echo Release Notes on screen
-  --template                CHANGELOG template
-  
-  -h, --help             Prints help
+  -v, --version string       Version
 ```
+
+### Calculate Release
+
+Calculates the next release version without makin further changes to the CHANGELOG nor other files and prints it on the screen
+
+```bash
+$> changelog-guardian release-notes
+```
+
+```
+  Usage:
+  Changelog calculate-release [flags]
+
+Flags:
+      --build string   Build metadata (semver)
+  -h, --help           help for calculate-release
+  -M, --major          Major Release
+  -m, --minor          Minor Release
+  -p, --patch          Patch Release
+      --pre string     Pre-release string (semver)
+```
+
