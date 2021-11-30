@@ -85,11 +85,15 @@ func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		return nil, err
 	}
 
-	gitlabProjectName := strings.Replace(*currentGitBAseUrl, "https://gitlab.com/", "", 1)
-	gitlabProjectName = strings.Replace(gitlabProjectName, ".git", "", 1)
+	*currentGitBAseUrl = strings.Replace(*currentGitBAseUrl, ".git", "", 1)
+	namespacedRepoSliced := strings.Split(*currentGitBAseUrl, "gitlab.com/")
+	if len(namespacedRepoSliced) <= 1 {
+		Log.Fatalf("Unable to retrieve gitlab repo/namespace from git origin")
+	}
+	namespacedRepo := namespacedRepoSliced[1]
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
-	project, _, err := gitlabClient.Projects.GetProject(gitlabProjectName, &gitlab.GetProjectOptions{})
+	project, _, err := gitlabClient.Projects.GetProject(namespacedRepo, &gitlab.GetProjectOptions{})
 	if err != nil {
 		return nil, err
 	}
