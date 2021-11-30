@@ -37,7 +37,13 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 	}
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
-	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
+	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
+	var namespacedRepo string
+	if len(namespacedRepoSlice) > 1 {
+		namespacedRepo = namespacedRepoSlice[1]
+	} else {
+		Log.Fatalf("Error retrieving Gitlab repository from git origin")
+	}
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
 	project, _, err := gitlabClient.Projects.GetProject(namespacedRepo, &gitlab.GetProjectOptions{})
@@ -200,7 +206,13 @@ func (gp *GitlabProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 	}
 
 	gitlabProjectWebUrl := strings.Replace(*currentGitBAseUrl, ".git", "", 1)
-	namespacedRepo := strings.Replace(gitlabProjectWebUrl, "https://gitlab.com/", "", 1)
+	namespacedRepoSlice := strings.Split(gitlabProjectWebUrl, "gitlab.com/")
+	var namespacedRepo string
+	if len(namespacedRepoSlice) > 1 {
+		namespacedRepo = namespacedRepoSlice[1]
+	} else {
+		Log.Fatalf("Error retrieving Gitlab repository from git origin")
+	}
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
 	project, _, err := gitlabClient.Projects.GetProject(namespacedRepo, &gitlab.GetProjectOptions{})
