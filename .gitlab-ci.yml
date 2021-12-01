@@ -22,11 +22,18 @@ release:
     - git checkout release/$(cat VERSION)
     - git add VERSION CHANGELOG.md
     - git commit -m "[AUTOMATED] Release $(cat VERSION)"
-    - go run main.go release-notes
-    - RELEASE_NOTES=$(sed -z 's/\n/<br>/g' RELEASE-NOTES.md)
+    - RELEASE_NOTES=$(go run main.go release-notes --echo)
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
-      -o merge_request.create -o merge_request.target=main -o merge_request.title="Release $(cat VERSION)"
-      -o merge_request.description="$RELEASE_NOTES"
+    - |
+      curl --location --request POST 'https://gitlab.com/api/v4/projects/"$CI_PROJECT_ID"/merge_requests' \
+      --header 'PRIVATE-TOKEN: "$GITLAB_PUSH_TOKEN"' \
+      --form 'id="'"$CI_PROJECT_ID"'"' \
+      --form 'title="title"' \
+      --form 'source_branch="release/$(cat VERSION)"' \
+      --form 'target_branch="main"' \
+      --form 'description="'"$RELEASE_NOTES"'"'
+
   only:
-    - merge_requests
-    - develop
+    - 31-prepare-release-flow
+  rules:
+    - if: '$TRIGGER == "Release"'
