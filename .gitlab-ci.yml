@@ -41,7 +41,6 @@ release:
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
-    - git remote set-url origin https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
     - git tag v$(cat VERSION)
     - git push origin v$(cat VERSION) -o ci-skip https://${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian
     - go get $(go list ./... | grep -v /vendor/)
