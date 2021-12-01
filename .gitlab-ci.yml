@@ -32,8 +32,5 @@ release:
       --form 'source_branch="release/$(cat VERSION)"' \
       --form 'target_branch="main"' \
       --form 'description="'"$RELEASE_NOTES"'"'
-
-  only:
-    - 31-prepare-release-flow
   rules:
     - if: '$TRIGGER == "Release"'
