@@ -24,13 +24,12 @@ release:
     - git commit -m "[AUTOMATED] Release $(cat VERSION)"
     - RELEASE_NOTES=$(go run main.go release-notes --echo)
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
-    - echo https://gitlab.com/api/v4/projects/"$CI_PROJECT_ID"/merge_requests
     - |
-      curl --location --request POST 'https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests' \
-      --header 'PRIVATE-TOKEN: "'"$GITLAB_PUSH_TOKEN"'"' \
+      curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests" \
+      --header "PRIVATE-TOKEN:$GITLAB_PUSH_TOKEN" \
       --form 'id="'"$CI_PROJECT_ID"'"' \
-      --form 'title="title"' \
-      --form 'source_branch="release/$(cat VERSION)"' \
+      --form "title="Release $(cat VERSION)"" \
+      --form "source_branch="release/$(cat VERSION)"" \
       --form 'target_branch="main"' \
       --form 'description="'"$RELEASE_NOTES"'"'
   rules:
