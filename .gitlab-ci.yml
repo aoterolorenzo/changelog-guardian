@@ -40,12 +40,12 @@ release:
   stage: release
   before_script:
     - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
-    - git remote set-url origin https://oauth2:GITLAB_PUSH_TOKEN@$project_url
+    - git remote set-url origin https://oauth2:$GITLAB_PUSH_TOKEN@$project_url
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
     - git tag v$(cat VERSION)
-    - git push origin HEAD:v$(cat VERSION) --force -o ci-skip https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
+    - git push origin HEAD:v$(cat VERSION) --force
     - go get $(go list ./... | grep -v /vendor/)
     - go install github.com/goreleaser/goreleaser@latest
     - go run main.go release-notes
@@ -54,7 +54,7 @@ release:
     - go run main.go calculate-release --pre SNAPSHOT > VERSION
     - git add VERSION
     - git commit -m "[AUTOMATED] Prepare for next iteration $(cat VERSION)"
-    - git push -o ci-skip https://oauth2:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
+    - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
     - |
       curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests" \
       --header "PRIVATE-TOKEN:$GITLAB_PUSH_TOKEN" \
