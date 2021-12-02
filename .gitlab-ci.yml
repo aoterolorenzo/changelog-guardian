@@ -48,8 +48,8 @@ release:
     - git tag v$(cat VERSION)
     - git push origin HEAD:refs/tags/v$(cat VERSION) --force
     - go get $(go list ./... | grep -v /vendor/)
-    - go install github.com/goreleaser/goreleaser@latest
     - go run main.go release-notes --echo
+    - go install github.com/goreleaser/goreleaser@latest
     - goreleaser init
 #    - git branch release/prepare-iteration-$(cat VERSION)
 #    - git checkout release/prepare-iteration-$(cat VERSION)
