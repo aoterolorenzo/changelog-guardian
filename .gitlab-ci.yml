@@ -86,7 +86,7 @@ release:
       curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests" \
       --header "PRIVATE-TOKEN:$GITLAB_PUSH_TOKEN" \
       --form 'id="'"$CI_PROJECT_ID"'"' \
-      --form "title=\"Release $(cat VERSION)\"" \
+      --form "title=\"Prepare develop iteration $(cat VERSION)\"" \
       --form "source_branch="release/prepare-iteration-$(cat VERSION)"" \
       --form 'target_branch="develop"' \
       --form 'description="This PR will prepare develop for the next release iteration $(cat VERSION)"'
