@@ -1,14 +1,15 @@
-package themes
+package templates
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	"io/ioutil"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -16,6 +17,9 @@ const markdownTaskRegexp = `- \[(?P<taskName>[^]]+)?]\((?P<taskHref>[^)]+)?\)\s?
 const markdownReleaseRegexp = `## \[(?P<releaseVersion>[^\]]+)]( - (?P<releaseDate>[0-9]{4}-[0-9]{2}-[0-9]{2}))?(?P<releaseYanked> \[YANKED])?`
 const markdownReleaseLinkRegexp = `\[VERSION]: (?P<releaseLink>.*)`
 const markdownCategoryRegexp = `### (?P<category>.*)`
+const markdownChangelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
+	"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
+	"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
 type MarkDownChangelogService struct {
 	AbstractChangelog
@@ -66,14 +70,18 @@ func (c *MarkDownChangelogService) Parse(pathToChangelog string) (*models.Change
 }
 
 func (c *MarkDownChangelogService) String(changelog models.Changelog) string {
-	const changelogHeader = "# Changelog\n\nAll notable changes to this project will be documented in this file." +
-		"\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," +
-		"\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
 
-	changelogStr := changelogHeader
+	changelogStr := markdownChangelogHeader
 	changelogStr += "\n"
+	changelogStr += c.NudeChangelogString(changelog)
+	return changelogStr
+
+}
+
+func (c *MarkDownChangelogService) NudeChangelogString(changelog models.Changelog) string {
+	var changelogStr string
 	for _, release := range changelog.Releases {
-		changelogStr += release.String()
+		changelogStr += c.ReleaseToString(release)
 	}
 
 	if len(changelog.Releases) > 0 {
@@ -86,8 +94,50 @@ func (c *MarkDownChangelogService) String(changelog models.Changelog) string {
 		}
 		changelogStr += "\n"
 	}
-	return changelogStr
 
+	return changelogStr
+}
+
+func (c *MarkDownChangelogService) ReleaseToString(r models.Release) string {
+	var yankedStr string
+
+	if r.Yanked {
+		yankedStr = " [YANKED]"
+	}
+	var dateStr string
+	if r.Date != "" {
+		dateStr = " - " + r.Date
+	}
+
+	if strings.ToUpper(r.Version) == "Unreleased" {
+		dateStr = ""
+	}
+
+	releaseStr := fmt.Sprintf("\n## [%s]%s%s", r.Version, dateStr, yankedStr)
+	releaseStr += "\n"
+
+	keys := make([]string, 0, len(r.Sections))
+	for k := range r.Sections {
+		keys = append(keys, string(k))
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		releaseStr += fmt.Sprintf("\n### %s\n\n", key)
+		for _, task := range r.Sections[models.Category(key)] {
+			releaseStr += fmt.Sprintf(c.TaskToString(task, ""))
+			releaseStr += fmt.Sprintln()
+		}
+	}
+	return releaseStr
+}
+
+func (c *MarkDownChangelogService) TaskToString(t models.Task, category models.Category) string {
+	var authorString string
+	if t.Author != "" {
+		authorString = fmt.Sprintf(" ([@%s](%s))", t.Author, t.AuthorHref)
+	}
+	return fmt.Sprintf("- [%s](%s) %s%s", t.ID, t.Href, t.Title, authorString)
 }
 
 func (c *MarkDownChangelogService) SaveChangelog(changelog models.Changelog, filePath string) error {

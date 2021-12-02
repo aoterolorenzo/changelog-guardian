@@ -1,18 +1,18 @@
-package middleware
+package pipes
 
 import (
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"strings"
 )
 
-type NaturalLanguageTaskPipe struct {
+type NaturalLanguageTasksPipe struct {
 }
 
-func NewNaturalLanguageTaskPipe() *NaturalLanguageTaskPipe {
-	return &NaturalLanguageTaskPipe{}
+func NewNaturalLanguageTasksPipe() *NaturalLanguageTasksPipe {
+	return &NaturalLanguageTasksPipe{}
 }
 
-func (nlm *NaturalLanguageTaskPipe) Pipe(task *infra.Task) (*infra.Task, bool, error) {
+func (nlm *NaturalLanguageTasksPipe) Filter(task *infra.Task) (*infra.Task, bool, error) {
 
 	words := [][]string{
 		{"Add", "Added"},

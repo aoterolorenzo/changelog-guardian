@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
@@ -10,31 +10,40 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
 )
 
-func RegularCmd() *models.Changelog {
+func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 
-	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
+	Log.Debugf("Preparing execution...\n")
+	argTemplate := cmd.Flag("template").Value.String()
+	if argTemplate != "" {
+		Settings.Template = argTemplate
+	}
+	Log.Debugf("Using %s template\n", Settings.Template)
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting template\n")
 	}
 
+	Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
 	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting release provider\n")
 	}
 
+	Log.Debugf("Tasks provider: %s\n", Settings.TasksProvider)
 	tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting tasks provider\n")
 	}
 
-	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleasePipes, Settings.TaskPipes)
+	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleasePipes, Settings.TasksPipes)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error creating controller\n")
 	}
 
+	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		panic(err)
+		Log.Fatalf("Error retrieving changelog file\n")
 	}
 
 	var lastRelease *models.Release
@@ -42,14 +51,20 @@ func RegularCmd() *models.Changelog {
 	if localChangelog != nil {
 		if len(localChangelog.Releases) > 1 {
 			lastRelease = &localChangelog.Releases[1]
+			Log.Infof("Retrieving releases and tasks data from Release %s...\n", lastRelease.Version)
 		}
 	} else {
 		lastRelease = nil
+		Log.Infof("Retrieving release and tasks data...\n")
 	}
 
+	Log.Infof("Preparing Changelog...\n")
+
 	releases, err := cgController.GetFilledReleasesFromInfra(lastRelease, Settings.MainBranch, Settings.DevelopBranch)
-	if err != nil {
-		panic(err)
+	if err != nil && err.Error() == "repository does not exist" {
+		Log.Fatalf("No git repository found on this path")
+	} else if err != nil {
+		Log.Fatalf(err.Error())
 	}
 	retrievedChangelog := models.NewChangelog()
 	retrievedChangelog.Releases = *releases
@@ -79,12 +94,16 @@ func RegularCmd() *models.Changelog {
 		retrievedChangelog = &mergedChangelog
 	}
 
+	argOutputTemplate := cmd.Flag("output-template").Value.String()
+	if argOutputTemplate != "" {
+		changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+	}
 	err = (*changelogService).SaveChangelog(*retrievedChangelog, Settings.ChangelogPath)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error saving changelog file\n")
 	}
 
-	fmt.Println("Done")
+	Log.Infof("Changelog saved\n")
 
 	return retrievedChangelog
 }

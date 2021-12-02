@@ -1,9 +1,5 @@
 package models
 
-import (
-	"fmt"
-)
-
 type Task struct {
 	ID         string
 	Name       string
@@ -28,13 +24,4 @@ func NewTask(id string, name string, href string, title string, author string, a
 
 func NewEmptyTask() *Task {
 	return &Task{}
-}
-
-// Stringify the task
-func (t *Task) String() string {
-	var authorString string
-	if t.Author != "" {
-		authorString = fmt.Sprintf(" ([@%s](%s))", t.Author, t.AuthorHref)
-	}
-	return fmt.Sprintf("- [%s](%s) %s%s", t.ID, t.Href, t.Title, authorString)
 }

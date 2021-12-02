@@ -1,8 +1,9 @@
 changelogPath: ./CHANGELOG.md
+releaseNotesPath: ./RELEASE-NOTES.md
 mainBranch: main
 defaultBranch: develop
 cgConfigPath: .cg-config.yml
-style: markdown
+template: markdown
 providers:
   gitlab:
     labels:
@@ -19,5 +20,35 @@ providers:
 releaseProvider: git
 tasksProvider: git
 releasePipes: [ 'semver' ]
-taskPipes: []
+tasksPipes: [ 'conventional_commits' ]
+tasksPipesCfg:
+  conventional_commits:
+    categories:
+      Breaking Changes: breaking
+      Added: feat
+      Changed: perf
+      Refactor: refactor
+      Fixed: fix
+      Removed: revert
+      Documentation: docs
+  inclusions_exclusions:
+    labels:
+      excluded: [ 'internal' ]
+      included: [ '*all' ]
+    paths:
+      excluded: [ ]
+      included: [ '*all' ]
 initialVersion: 0.1.0
+templatesCfg:
+  stylish_markdown:
+    categories:
+      Breaking Changes: ['f70000','🚨']
+      Added: ['5ccb31','✨']
+      Changed: ['31cb7d','✒️']
+      Refactor: ['cba531','🏗']
+      Fixed: ['cb3131','🐛']
+      Dependencies: ['cb6b31','📦']
+      Deprecated: ['4e31cb','✖️']
+      Removed: ['7631cb','❌']
+      Documentation: ['3188cb','📖']
+      Security: ['b841a0','🔒']

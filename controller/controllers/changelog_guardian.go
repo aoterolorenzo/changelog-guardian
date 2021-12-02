@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"fmt"
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	services2 "gitlab.com/aoterocom/changelog-guardian/application/services"
+	"gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
+	"gitlab.com/aoterocom/changelog-guardian/controller/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/controller/services"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"strconv"
@@ -17,33 +18,33 @@ type ChangelogGuardianController struct {
 	releaseProvider infraInterfaces.Provider
 	taskProvider    infraInterfaces.Provider
 	releasePipes    []interfaces.ReleasePipe
-	taskPipes       []interfaces.TaskPipe
+	tasksPipes      []interfaces.TasksPipe
 }
 
-func NewChangelogGuardianController(releaseProvider infraInterfaces.Provider, taskProvider infraInterfaces.Provider, releasePipesStr []string, taskPipesStr []string) (*ChangelogGuardianController, error) {
+func NewChangelogGuardianController(releaseProvider infraInterfaces.Provider, taskProvider infraInterfaces.Provider, releasePipesStr []string, tasksPipesStr []string) (*ChangelogGuardianController, error) {
 	// reversing task and release pipes to start iterating over the last
 	helpers.ReverseAny(releasePipesStr)
-	helpers.ReverseAny(taskPipesStr)
+	helpers.ReverseAny(tasksPipesStr)
 
 	var releasePipes []interfaces.ReleasePipe
 	for _, pipeStr := range releasePipesStr {
-		pipe, err := services.ReleasePipeSelector(pipeStr)
+		pipe, err := selectors.ReleasePipeSelector(pipeStr)
 		if err != nil {
 			return nil, err
 		}
 		releasePipes = append(releasePipes, *pipe)
 	}
 
-	var taskPipes []interfaces.TaskPipe
-	for _, pipeStr := range taskPipesStr {
-		pipe, err := services.TaskPipeSelector(pipeStr)
+	var tasksPipes []interfaces.TasksPipe
+	for _, pipeStr := range tasksPipesStr {
+		pipe, err := selectors.TasksPipeSelector(pipeStr)
 		if err != nil {
 			return nil, err
 		}
-		taskPipes = append(taskPipes, *pipe)
+		tasksPipes = append(tasksPipes, *pipe)
 	}
 
-	return &ChangelogGuardianController{releaseProvider: releaseProvider, taskProvider: taskProvider, releasePipes: releasePipes, taskPipes: taskPipes}, nil
+	return &ChangelogGuardianController{releaseProvider: releaseProvider, taskProvider: taskProvider, releasePipes: releasePipes, tasksPipes: tasksPipes}, nil
 }
 
 func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *models.Release, mainBranch string, defaultBranch string) (*[]models.Release, error) {
@@ -83,6 +84,8 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		infraTruncatedReleases = *releases
 	}
 
+	settings.Log.Debugf("Found %d releases\n", len(infraTruncatedReleases))
+
 	// Pass releases through Release Pipes
 	infraTruncatedReleases = cgc.throughReleasePipes(infraTruncatedReleases)
 
@@ -102,7 +105,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 			timeTo = nil
 		}
 
-		// If next release doesn't exist (UNRELEASED has not next), set to there
+		// If next release doesn't exist (Unreleased has not next), set to there
 		var releaseFrom infra.Release
 		var timeFrom *time.Time
 		if i != len(infraTruncatedReleases)-1 {
@@ -120,19 +123,18 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		}
 
 		// Obtain the tasks between the last release to this one (or to now)
-		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, mainBranch)
+		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, defaultBranch)
 		if err != nil {
 			return nil, err
 		}
 
-		fmt.Println("Retrieved " + strconv.Itoa(len(*tasks)) + " tasks for Release " + release.Name + "...")
-
+		settings.Log.Debugf("Retrieved %s tasks for Release %s\n", strconv.Itoa(len(*tasks)), release.Name)
 		// Pass tasks through Task Pipes
-		*tasks = cgc.throughTaskPipes(*tasks)
+		*tasks = cgc.throughTasksPipes(*tasks)
 
 		// Map each task to an application layer model to add it to the release
 		for _, task := range *tasks {
-			fmt.Println("\t -> " + task.Name + " " + task.Title)
+			settings.Log.Debugf("-> %s %s\n", task.Name, task.Title)
 			appTruncatedRelease.Sections[task.Category] =
 				append(appTruncatedRelease.Sections[task.Category],
 					*services.NewModelMapperService().InfraTaskToApplicationModel(task))
@@ -175,11 +177,12 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	}
 
 	unreleasedTasks, _ := cgc.taskProvider.GetTasks(from, nil, defaultBranch)
+	settings.Log.Debugf("Retieved %d new unreleased tasks\n", len(*unreleasedTasks))
 
 	// Pass tasks through Task Pipes
-	*unreleasedTasks = cgc.throughTaskPipes(*unreleasedTasks)
+	*unreleasedTasks = cgc.throughTasksPipes(*unreleasedTasks)
 
-	unreleasedRelease := models.NewRelease("UNRELEASED", "",
+	unreleasedRelease := models.NewRelease("Unreleased", "",
 		releaseUrl, false, nil)
 	for _, task := range *unreleasedTasks {
 		// If the tasks in unreleased were not in previous release, we append it to the final unreleased section
@@ -191,6 +194,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		}
 
 		if !lastReleaseContainsTask {
+			settings.Log.Debugf("-> %s %s\n", task.Name, task.Title)
 			category := cgc.releaseProvider.DefineCategory(task)
 			unreleasedRelease.Sections[category] = append(unreleasedRelease.Sections[category],
 				*services.NewModelMapperService().InfraTaskToApplicationModel(task))
@@ -209,7 +213,7 @@ func (cgc *ChangelogGuardianController) GetTask(taskId string) (*models.Task, er
 		return nil, err
 	}
 
-	taskFromProvider := cgc.throughTaskPipes([]infra.Task{*task})
+	taskFromProvider := cgc.throughTasksPipes([]infra.Task{*task})
 
 	if len(taskFromProvider) != 0 {
 		return services.NewModelMapperService().InfraTaskToApplicationModel(taskFromProvider[0]), nil
@@ -227,7 +231,7 @@ func (cgc *ChangelogGuardianController) throughReleasePipes(releases []infra.Rel
 
 		var provisionalReleases []infra.Release
 		for _, release := range finalReleases {
-			pipeedRelease, _, err := releasePipe.Pipe(&release)
+			pipeedRelease, _, err := releasePipe.Filter(&release)
 			if err == nil && pipeedRelease != nil {
 				provisionalReleases = append(provisionalReleases, *pipeedRelease)
 			}
@@ -238,16 +242,16 @@ func (cgc *ChangelogGuardianController) throughReleasePipes(releases []infra.Rel
 	return finalReleases
 }
 
-func (cgc *ChangelogGuardianController) throughTaskPipes(tasks []infra.Task) []infra.Task {
+func (cgc *ChangelogGuardianController) throughTasksPipes(tasks []infra.Task) []infra.Task {
 	// Reverse to start from the first item
-	helpers.ReverseAny(cgc.taskPipes)
+	helpers.ReverseAny(cgc.tasksPipes)
 
 	var finalTasks = tasks
-	for _, taskPipe := range cgc.taskPipes {
+	for _, tasksPipe := range cgc.tasksPipes {
 
 		var provisionalTasks []infra.Task
 		for _, task := range finalTasks {
-			pipeedTask, _, err := taskPipe.Pipe(&task)
+			pipeedTask, _, err := tasksPipe.Filter(&task)
 			if err == nil && pipeedTask != nil {
 				provisionalTasks = append(provisionalTasks, *pipeedTask)
 			}

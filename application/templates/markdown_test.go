@@ -1,7 +1,6 @@
-package themes
+package templates
 
 import (
-	"fmt"
 	"github.com/magiconair/properties/assert"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"io/ioutil"
@@ -17,14 +16,13 @@ func TestTask(t *testing.T) {
 	changelogService := MarkDownChangelogService{}
 	parsedTaskPtr := changelogService.parseTask(OkTask, "")
 	task = &parsedTaskPtr
-	fmt.Println(task)
-	assert.Equal(t, task.String(), OkTask)
+	assert.Equal(t, changelogService.TaskToString(*task, ""), OkTask)
 }
 
 func TestChangelogParsing(t *testing.T) {
 	cwd, _ := os.Getwd()
 	changelogService := MarkDownChangelogService{}
-	pathToChangelog := cwd + "/" + "resources/CHANGELOG.md"
+	pathToChangelog := cwd + "/" + "resources/markdown_CHANGELOG.md"
 
 	changelog, err := changelogService.Parse(pathToChangelog)
 	if err != nil {

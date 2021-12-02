@@ -1,17 +1,15 @@
 # Changelog Guardian
 
-
-
 ## Getting started
 
 Changelog Guardian is the tool that will help you to keep your Changelog safely automated and up to date.
 
 ## Installation
 
-Use [Go Binaries](https://gobinaries.com/) to automatically compile, retrieve and install.
+We provide a INSTALL.sh file that identifies your SO and architecture, and directly downloads and installs the specific `changelog-guardian` binary into your /usr/local/bin for the latest version available.
 
 ```bash
-curl -sf https://gobinaries.com/aoterolorenzo/changelog-guardian | sh
+curl -sf https://gitlab.com/aoterocom/changelog-guardian/-/raw/main/INSTALL.sh | sh
 ```
 
 ## Configuration
@@ -25,7 +23,8 @@ The default configuration above-mentioned can be customised and overwritten on a
 This file could contain only one or various configuration parameters. Here is an example of all the parameters that forms the Changelog Guardian configuration:
 
 ```yml
-changelogPath: ./CHANGELOG.md #Path to the project's Changelog File
+changelogPath: ./CHANGELOG.md # Path to the project's Changelog File
+releaseNotesPath: ./RELEASE-NOTES.md # Path to the file where to save generated Release Notes
 mainBranch: main # Main branch of the repository
 defaultBranch: develop # Default/develop branch of the repository
 providers: # Internal configuration of the Changelog Guardian providers
@@ -43,10 +42,40 @@ providers: # Internal configuration of the Changelog Guardian providers
       Security: kind::security
 releaseProvider: git # Release provider
 tasksProvider: git # Tasks provider
-style: markdown # Changelog style (theming)
+template: markdown # Changelog template (theming)
 releasePipes: [ 'semver' ] # Release pipes
-taskPipes: [] # Task pipes
+tasksPipes: [] # Task pipes
+tasksPipesCfg:
+  conventional_commits:
+    categories: # Associates Categories with Conventional Commits types
+      Breaking Changes: breaking
+      Added: feat
+      Changed: perf
+      Refactor: refactor
+      Fixed: fix
+      Removed: revert
+      Documentation: docs
+  inclusions_exclusions:
+    labels:
+      excluded: [ 'internal' ]
+      included: [ '*all' ]
+    paths:
+      excluded: [ ]
+      included: [ '*all' ]
 initialVersion: 0.1.0 # Initial version for generating an initial release
+templatesCfg:
+  stylish_markdown:
+    categories: # Selects a color and an emoji for Categories on template generated CHANGELOG's
+      Breaking Changes: ['f70000','🚨']
+      Added: ['5ccb31','✨']
+      Changed: ['31cb7d','✒️']
+      Refactor: ['cba531','🏗']
+      Fixed: ['cb3131','🐛']
+      Dependencies: ['cb6b31','📦']
+      Deprecated: ['4e31cb','✖️']
+      Removed: ['7631cb','❌']
+      Documentation: ['3188cb','📖']
+      Security: ['b841a0','🔒']
 ```
 
 ### Providers
@@ -83,7 +112,7 @@ The pipes can be combined and Changelog Guardian will make each release/task go 
 For example, using the `gitlab_resolver` and the `natural_language` task pipes simultaneously
 
 ```yml
-taskPipes: [ 'gitlab_resolver', 'natural_language']
+tasksPipes: [ 'gitlab_resolver', 'natural_language']
 ```
 
 will result in something like:
@@ -96,38 +125,51 @@ Filter the releases and allows only those which matches Semantic Versioning nome
 
 Pipe code: `semver`
 
-#### Gitlab Resolver task Pipe
+#### Gitlab Resolver tasks Pipe
 
 Automatic Gitlab Merge Request merge with a message of the kind `Resolve "Issue tittle"`. This pipe modifies the task title to match only `Issue title`
 
 For example: `Resolve "Add new provider"` -> `Add new provider`
 
-#### Natural Language task Pipe
+#### Natural Language tasks Pipe
 
 Usually we name our tasks on an infinitive voice: `Add new feature`. This pipe will filter the task names and will replace some of the most frequently used verbs with a past voice.
 
-Some examples: 
+Some examples:
 
 `Add new provider` -> `Added new provider`
 `Fix new provider` -> `Fixed new provider`
 `Refactor new provider` -> `Refactorized new provider`
 
-#### Conventional Commits task pipe (WIP)
+#### Inclusions&Exclusions tasks pipe
 
-This pipe will filter your tasks (mostly for using with the Git task provider) following [Conventional Commits](https://www.conventionalcommits.org/) specification, and appending them to your changelog sections depending on the commit type and scope.
+Need to exclude or include only certain labels or paths that tasks must address? With this pipe you can do it
+
+Take a look at the custom configuration section to see the specific configuration to make it happen.
+PS: For inclusions, you can use the `*all` wildcard to allow all files/paths.
+
+#### Conventional Commits task pipe
+
+This pipe filters your tasks (mostly for using with the Git task provider) following [Conventional Commits](https://www.conventionalcommits.org/) specification, and appending them to your changelog sections depending on the commit type.
 
 
-### Changelog Styles
+### Changelog Templates
 
-Maybe you would like to maintain a Changelog fed with some emojis. Or perhaps you want to generate a CHANGELOG.adoc in asciidoc. Changelog Styles are meant for exactly cover this ~~whims~~ needs.
+Maybe you would like to maintain a Changelog fed with some emojis. Or perhaps you want to generate a CHANGELOG.adoc in asciidoc. Changelog Templates are meant for exactly cover this ~~whims~~ needs.
 
-Currently, only one style is available: `markdown`
+#### Markdown Template
 
-#### Markdown Style
-
+Default Changelog Template. 
 Follows the [Keep A Changelog](https://keepachangelog.com/en/1.1.0/#how) specification.
 
-NOTE: More styles about to come: `asciidoc`, `markdown_fun` (with emojis)
+Template code: `markdown`
+
+#### Stylish Markdown Template
+
+Markdown Template fed with some emojis and badges. 
+Follows the [Keep A Changelog](https://keepachangelog.com/en/1.1.0/#how) specification.
+
+Template code: `stylish_markdown`
 
 ## Usage
 
@@ -159,7 +201,25 @@ Flags:
 You can generate a changelog with the base command from a folder containing a git repository. This will generate a `CHANGELOG.md` file automatically with the default settings.
 
 ```bash
-$> changelog-guardian [command]
+$> changelog-guardian
+```
+
+```
+Usage:
+  changelog-guardian [flags]
+
+Flags:
+ 
+  --template             CHANGELOG template
+
+  -h, --help             Prints help
+
+  Global Flags:
+      --changelog-path string    CHANGELOG path
+      --config string            Config file path
+      --output-template string   Output CHANGELOG template
+      --silent                   Logging level
+      --template string          CHANGELOG template
 ```
 
 ### Release
@@ -183,7 +243,8 @@ Flags:
   -f, --force            Forces the versioning altough differs from the calculated one
       --pre string       Pre-release string (semver)
       --build string     Build metadata (semver)
-      
+  --template             CHANGELOG template
+  
   -h, --help             Prints help
 ```
 
@@ -203,12 +264,13 @@ Usage:
 Flags:
   -i, --id string             Task ID
   -t, --title string          Task title
-    -l, --link string           Task link
+  -l, --link string           Task link
   -f, --author string         Task author
   -v, --authorLink string     Task author link
   -c, --category string       Task category (default "Added")
   -s, --skip-autocompletion   Skip autocompletion from providerUsed to check the task data from it through the provided --id
-
+  --template             CHANGELOG template
+  
   -h, --help                  Prints help
 ```
 
@@ -225,6 +287,48 @@ $> changelog-guardian yank
 
 Flags:
   -v, --version string   Version to yank
+  --template             CHANGELOG template
   
   -h, --help             Prints help
 ```
+
+### Release Notes
+
+Generates the Release Notes for the last released version (or the one specified by the --version flag).
+
+```bash
+$> changelog-guardian release-notes
+```
+
+```
+  Usage:
+  Changelog release-notes [flags]
+
+Flags:
+  -e, --echo                 Echo Release Notes on screen
+  -h, --help                 Prints help
+  -o, --output-file string   Output file
+  -v, --version string       Version
+```
+
+### Calculate Release
+
+Calculates the next release version without makin further changes to the CHANGELOG nor other files and prints it on the screen
+
+```bash
+$> changelog-guardian release-notes
+```
+
+```
+  Usage:
+  Changelog calculate-release [flags]
+
+Flags:
+      --build string   Build metadata (semver)
+  -h, --help           help for calculate-release
+  -M, --major          Major Release
+  -m, --minor          Minor Release
+  -p, --patch          Patch Release
+      --pre string     Pre-release string (semver)
+```
+

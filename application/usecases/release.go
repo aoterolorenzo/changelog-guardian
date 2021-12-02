@@ -2,19 +2,29 @@ package usecases
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"gitlab.com/aoterocom/changelog-guardian/application/helpers"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/application/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	"strconv"
 	"time"
 )
 
 func ReleaseCmd(cmd *cobra.Command, args []string) {
 	// Update current CHANGELOG to prepare for release, using the regular command
-	changelog := RegularCmd()
+	changelog := RegularCmd(cmd, args)
+
+	argTemplate := cmd.Flag("template").Value.String()
+	if argTemplate != "" {
+		Settings.Template = argTemplate
+	}
+	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
+	if err != nil {
+		Log.Fatalf("Error selecting template\n")
+	}
 
 	// Load args:
 	argPatch, _ := strconv.ParseBool(cmd.Flag("patch").Value.String())
@@ -30,14 +40,9 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	var lastRelease *models.Release
 	semVer := services.NewSemVerService()
 
-	changelogService, err := selectors.ChangelogServiceSelector(Settings.Style)
-	if err != nil {
-		panic(err)
-	}
-
 	if argForce && argVersion != "" {
 		nextVersion = argVersion
-		fmt.Println("WARNING: forcing a specific version is not recommended.")
+		Log.Warnf("\"WARNING: forcing a specific version is not recommended\n")
 	} else if len(changelog.Releases) > 1 {
 		unreleased := &changelog.Releases[0]
 		lastRelease = &changelog.Releases[1]
@@ -55,28 +60,28 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 			if argPatch {
 				checkVersion := semVer.BumpPatch(versionToBump)
 				if nextVersion != checkVersion {
-					fmt.Println("Cannot release a patch version: current tasks imply a minor/major version bump.")
+					Log.Errorf("Cannot release a patch version: current tasks imply a minor/major version bump\n")
 					return
 				}
 			}
 			if argMinor {
 				checkVersion := semVer.BumpMinor(versionToBump)
 				if nextVersion != checkVersion {
-					fmt.Println("Cannot release a minor version: no current tasks implying a minor version " +
-						"or at least implying breaking changes")
+					Log.Errorf("Cannot release a minor version: no current tasks implying a minor version " +
+						"or at least implying breaking changes\n")
 					return
 				}
 			}
 			if argMajor {
 				checkVersion := semVer.BumpMinor(versionToBump)
 				if nextVersion != checkVersion {
-					fmt.Println("Cannot release a major version: no breaking changes found")
+					Log.Errorf("Cannot release a major version: no breaking changes found\n")
 					return
 				}
 			}
 			if argVersion != "" {
 				if nextVersion != argVersion {
-					fmt.Println("Version breaks semver: current version expected would be " + nextVersion)
+					Log.Errorf("Version breaks semver: current version expected would be %s", nextVersion)
 					return
 				}
 			}
@@ -105,18 +110,20 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 
 	if !semVer.IsSemverValid(nextVersion) {
-		fmt.Println("Provider build metadata or pre-release breaks Semver. The result version string " +
-			nextVersion + " is not valid")
+		Log.Errorf("Provider build metadata or pre-release breaks Semver. "+
+			"The result version string %s is not valid", nextVersion)
 		return
 	}
 
-	// Convert UNRELEASED to nextVersion and add new UNRELEASE section
+	Log.Infof("Preparing Changelog with Release %s\n", nextVersion)
+
+	// Convert Unreleased to nextVersion and add new UNRELEASE section
 	unreleased := &changelog.Releases[0]
 	unreleased.Version = nextVersion
 
 	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error selecting release provider\n")
 	}
 	var from *string
 	if lastRelease == nil {
@@ -126,7 +133,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	}
 	url, err := (*releaseProvider).ReleaseURL(from, nextVersion)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error retrieving release url\n")
 	}
 	unreleased.Link = *url
 	unreleased.Date = time.Now().Format("2006-01-02")
@@ -135,11 +142,21 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 
 	helpers.ReverseAny(changelog.Releases)
 	newUnreleasedURL, err := (*releaseProvider).ReleaseURL(&unreleased.Version, Settings.DevelopBranch)
-	changelog.Releases = append(changelog.Releases, *models.NewRelease("UNRELEASED", "", *newUnreleasedURL, false, nil))
+	changelog.Releases = append(changelog.Releases, *models.NewRelease("Unreleased", "", *newUnreleasedURL, false, nil))
 	helpers.ReverseAny(changelog.Releases)
 
+	argOutputTemplate := cmd.Flag("output-template").Value.String()
+	if argOutputTemplate != "" {
+		changelogService, err = selectors.ChangelogTemplateSelector(argOutputTemplate)
+	}
 	err = (*changelogService).SaveChangelog(*changelog, Settings.ChangelogPath)
 	if err != nil {
-		panic(err)
+		Log.Fatalf("Error saving changelog file\n")
+	}
+
+	Log.Infof("Changelog saved\n")
+
+	if Log.GetLevel() <= log.ErrorLevel {
+		fmt.Printf("%s", nextVersion)
 	}
 }

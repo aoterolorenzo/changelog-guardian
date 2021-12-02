@@ -1,7 +1,6 @@
 package settings
 
 import (
-	"fmt"
 	"github.com/imdario/mergo"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gopkg.in/yaml.v3"
@@ -17,11 +16,12 @@ var settingsFile string
 var Settings = &GlobalSettings{}
 
 type GlobalSettings struct {
-	ChangelogPath string `yaml:"changelogPath"`
-	MainBranch    string `yaml:"mainBranch"`
-	DevelopBranch string `yaml:"defaultBranch"`
-	CGConfigPath  string `yaml:"cgConfigPath"`
-	Providers     struct {
+	ChangelogPath    string `yaml:"changelogPath"`
+	ReleaseNotesPath string `yaml:"releaseNotesPath"`
+	MainBranch       string `yaml:"mainBranch"`
+	DevelopBranch    string `yaml:"defaultBranch"`
+	CGConfigPath     string `yaml:"cgConfigPath"`
+	Providers        struct {
 		Gitlab struct {
 			Labels map[models.Category]string `yaml:"labels"`
 		} `yaml:"gitlab"`
@@ -29,28 +29,63 @@ type GlobalSettings struct {
 	ReleaseProvider string   `yaml:"releaseProvider"`
 	TasksProvider   string   `yaml:"tasksProvider"`
 	ReleasePipes    []string `yaml:"releasePipes"`
-	TaskPipes       []string `yaml:"taskPipes"`
-	InitialVersion  string   `yaml:"initialVersion"`
-	Style           string   `yaml:"style"`
+	TasksPipes      []string `yaml:"tasksPipes"`
+	TasksPipesCfg   struct {
+		ConventionalCommits struct {
+			Categories map[models.Category]string `yaml:"categories"`
+		} `yaml:"conventional_commits"`
+		InclusionsExclusions struct {
+			Labels struct {
+				Inclusions []string
+				Exclusions []string
+			} `yaml:"labels"`
+			Paths struct {
+				Inclusions []string
+				Exclusions []string
+			} `yaml:"paths"`
+		} `yaml:"inclusions_exclusions"`
+	} `yaml:"tasksPipesCfg"`
+	InitialVersion  string `yaml:"initialVersion"`
+	Template        string `yaml:"template"`
+	TemplatesConfig struct {
+		StylishMarkdown struct {
+			Categories map[models.Category][]string `yaml:"categories"`
+		} `yaml:"stylish_markdown"`
+	} `yaml:"templatesCfg"`
 }
 
 func init() {
-	fmt.Println("Constructing internal settings...")
+	Log.Debugf("Generating internal settings...\n")
 	if err := extractSettings(settingsFile); err != nil {
 		log.Panicln(err)
 	}
 
-	fmt.Println("Retrieving settings from " + Settings.CGConfigPath + "...")
+	Log.Debugf("Retrieving settings from %s...\n", Settings.CGConfigPath)
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
 	if err != nil {
-		fmt.Printf(Settings.CGConfigPath + " not available. Skipping...")
+		Log.Debugf("File %s not available. Skilling\n", Settings.CGConfigPath)
 	} else {
 		if err := extractSettings(string(yamlFile)); err != nil {
 			log.Panicln(err)
 		}
 	}
+	Log.Debugf("Settings successfully generated\n")
+}
 
-	fmt.Println("Settings successfully retrieved.")
+func (g *GlobalSettings) RetrieveSettingsFromFile(file string) {
+	settingsFile, err := ioutil.ReadFile(file)
+
+	if err := extractSettings(string(settingsFile)); err != nil {
+		log.Panicln(err)
+	}
+
+	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
+	if err != nil {
+	} else {
+		if err := extractSettings(string(yamlFile)); err != nil {
+			log.Panicln(err)
+		}
+	}
 }
 
 func extractSettings(content string) error {
