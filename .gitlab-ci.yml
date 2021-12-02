@@ -38,11 +38,14 @@ prepare-release:
 
 release:
   stage: release
+  before_script:
+    - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
+    - git remote set-url origin https://oauth2:GITLAB_PUSH_TOKEN@$project_url
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
     - git tag v$(cat VERSION)
-    - git push v$(cat VERSION) -o ci-skip https://${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian
+    - git push origin $tag
     - go get $(go list ./... | grep -v /vendor/)
     - go install github.com/goreleaser/goreleaser@latest
     - go run main.go release-notes
@@ -60,5 +63,5 @@ release:
       --form "source_branch="release/prepare-iteration-$(cat VERSION)"" \
       --form 'target_branch="develop"' \
       --form 'description="This PR will prepare develop for the next release iteration $(cat VERSION)"'
-  rules:
-    - if: '$TRIGGER == "PREPARE"'
+  only:
+    - merge_requests
