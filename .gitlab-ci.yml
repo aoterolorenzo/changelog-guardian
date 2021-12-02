@@ -44,7 +44,9 @@ release:
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
+    - ls
     - git checkout origin/main
+    - git config pull.rebase true
     - git pull origin main
     - git tag v$(cat VERSION)
     - git push origin HEAD:refs/tags/v$(cat VERSION) --force
