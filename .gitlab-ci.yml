@@ -46,7 +46,7 @@ release:
     - git config user.email "$GIT_EMAIL"
     - git checkout origin/main
     - git tag v$(cat VERSION)
-    - git push origin HEAD:refs/tags/v$(cat VERSION) --force
+    - git push origin --force
 #    - go get $(go list ./... | grep -v /vendor/)
 #    - go install github.com/goreleaser/goreleaser@latest
 #    - go run main.go release-notes
