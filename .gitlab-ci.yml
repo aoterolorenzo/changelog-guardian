@@ -40,7 +40,7 @@ release:
   stage: release
   before_script:
     - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
-    - git remote set-url origin https://oauth2:$GITLAB_PUSH_TOKEN@$project_url
+    - git remote set-url origin https://gitlab-ci-token:$GITLAB_PUSH_TOKEN@gitlab.com/aoterocom/changelog-guardian.git
   script:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
