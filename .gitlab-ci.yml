@@ -45,10 +45,10 @@ release:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
     - git tag v$(cat VERSION)
-    - git push origin HEAD:v$(cat VERSION) --force
+    - git push origin HEAD:v$(cat VERSION) --force -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
     - go get $(go list ./... | grep -v /vendor/)
     - go install github.com/goreleaser/goreleaser@latest
-    - go run main.go release-notes -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
+    - go run main.go release-notes
     - git branch release/prepare-iteration-$(cat VERSION)
     - git checkout release/prepare-iteration-$(cat VERSION)
     - go run main.go calculate-release --pre SNAPSHOT > VERSION
