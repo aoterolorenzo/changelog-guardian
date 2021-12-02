@@ -45,6 +45,7 @@ release:
     - git config user.name "$GIT_USERNAME"
     - git config user.email "$GIT_EMAIL"
     - git checkout origin/main
+    - git pull origin main
     - git tag v$(cat VERSION)
     - git push origin HEAD:refs/tags/v$(cat VERSION) --force
     - go get $(go list ./... | grep -v /vendor/)
