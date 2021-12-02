@@ -7,15 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...develop)
 
+## [![1.1.0]![2021-12-02]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...1.1.0)
+
 ### ![Added]
 
+- ✨ [!39](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/39) Added INSTALL.sh ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!37](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/37) Enable and implement CLI args ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!36](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/36) Added calculate-release command ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!35](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/35) Added versioning system ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!34](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/34) Added Exclusions tasks pipe ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!32](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/32) Added Conventional Commits pipe ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!31](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/31) Implemented logging system ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!25](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/25) Prepare release flow ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!28](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/28) Allow different input and output templates ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!27](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/27) Add release-notes command ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!26](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/26) Add stylish_markdown style template ([@aoterocom](https://gitlab.com/aoterocom))
 
+### ![Documentation]
+
+- 📖 [!42](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/42) Update README.md documentation ([@aoterocom](https://gitlab.com/aoterocom))
+- 📖 [!30](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/30) Update CHANGELOG.md ([@aoterocom](https://gitlab.com/aoterocom))
+
 ### ![Fixed]
 
+- 🐛 [!41](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/41) Added .gitignore and remove .idea folder ლ(ಠ_ಠლ) ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!38](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/38) Update Unreleased references to unify nomenclature ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!29](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/29) Fix release titles on stylish_markdown template ([@aoterocom](https://gitlab.com/aoterocom))
+
+### ![Refactor]
+
+- 🏗 [!40](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/40) Refactorized panic calls into more friendly errors ([@aoterocom](https://gitlab.com/aoterocom))
+- 🏗 [!33](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/33) Rebrand styles into templates ([@aoterocom](https://gitlab.com/aoterocom))
 
 ## [![v1.0.0]![2021-11-25]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.0.0)
 
@@ -55,6 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 [!13](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/13) Fixed forcing specific bump type behaviour on release command ([@aoterocom](https://gitlab.com/aoterocom))
 
 [Unreleased]: https://img.shields.io/badge/-Unreleased-blueviolet?&style=for-the-badge
+[1.1.0]: https://img.shields.io/badge/Release-1.1.0-blueviolet?&style=for-the-badge
+[2021-12-02]: https://img.shields.io/badge/-2021--12--02-white?&style=for-the-badge
 [v1.0.0]: https://img.shields.io/badge/Release-v1.0.0-blueviolet?&style=for-the-badge
 [2021-11-25]: https://img.shields.io/badge/-2021--11--25-white?&style=for-the-badge
 [Added]: https://img.shields.io/badge/-ADDED-5ccb31.svg?&style=flat-square
@@ -67,3 +91,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [Refactor]: https://img.shields.io/badge/-REFACTOR-cba531.svg?&style=flat-square
 [Removed]: https://img.shields.io/badge/-REMOVED-7631cb.svg?&style=flat-square
 [Security]: https://img.shields.io/badge/-SECURITY-b841a0.svg?&style=flat-square
+[YANKED]: https://img.shields.io/badge/-YANKED-blueviolet.svg?&style=for-the-badge
