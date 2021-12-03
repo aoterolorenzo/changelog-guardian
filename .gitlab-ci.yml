@@ -73,9 +73,9 @@ release:
     - git tag v$(cat VERSION)
     - git push origin HEAD:refs/tags/v$(cat VERSION) --force
     - go get $(go list ./... | grep -v /vendor/)
+    - go run main.go calculate-release --pre SNAPSHOT > VERSION
     - git branch release/prepare-iteration-$(cat VERSION)
     - git checkout release/prepare-iteration-$(cat VERSION)
-    - go run main.go calculate-release --pre SNAPSHOT > VERSION
     - git add VERSION
     - git commit -m "[AUTOMATED] Prepare for next iteration $(cat VERSION)"
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
@@ -86,7 +86,7 @@ release:
       curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests" \
       --header "PRIVATE-TOKEN:$GITLAB_PUSH_TOKEN" \
       --form 'id="'"$CI_PROJECT_ID"'"' \
-      --form "title=\"Release $(cat VERSION)\"" \
+      --form "title=\"Prepare develop iteration $(cat VERSION)\"" \
       --form "source_branch="release/prepare-iteration-$(cat VERSION)"" \
       --form 'target_branch="develop"' \
       --form 'description="This PR will prepare develop for the next release iteration $(cat VERSION)"'

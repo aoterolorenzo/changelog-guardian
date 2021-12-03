@@ -12,7 +12,7 @@ case "$LAST_VERSION" in
     ;;
 esac
 
-STATUS_CODE=$(curl -L -I HEAD https://github.com/aoterolorenzo/changelog-guardian/releases/download/v"$LAST_VERSION"/changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz --silent | head -n 1)
+STATUS_CODE=$(curl -L -I HEAD https://gitlab.com/aoterocom/changelog-guardian/-/releases/v"$LAST_VERSION"/downloads/changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz --silent | head -n 1)
 
 case "$STATUS_CODE" in
   *"302"*)
@@ -20,7 +20,7 @@ case "$STATUS_CODE" in
       cd /tmp/changelog-guardian || exit
 
       echo "Downloading..."
-      curl -L https://github.com/aoterolorenzo/changelog-guardian/releases/download/v"$LAST_VERSION"/changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz --output changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz
+      curl -L https://gitlab.com/aoterocom/changelog-guardian/-/releases/v"$LAST_VERSION"/downloads/changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz --output changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz
       echo "Decompressing..."
       tar -zxvf changelog-guardian_"$LAST_VERSION"_"$(uname -s)"_"$(uname -m)".tar.gz > /dev/null 2>&1
       echo "Installing to /usr/local/bin..."
