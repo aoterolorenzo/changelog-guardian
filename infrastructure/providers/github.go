@@ -165,7 +165,7 @@ func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		var labelStrings []string
 		labels := pullRequest.Labels
 		for _, label := range labels {
-			labelStrings = append(labelStrings, label.String())
+			labelStrings = append(labelStrings, *label.Name)
 		}
 
 		var fileChanges []string
