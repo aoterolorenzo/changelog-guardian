@@ -9,6 +9,7 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
+	selectors2 "gitlab.com/aoterocom/changelog-guardian/infrastructure/selectors"
 	"strconv"
 	"time"
 )
@@ -121,7 +122,7 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	unreleased := &changelog.Releases[0]
 	unreleased.Version = nextVersion
 
-	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
+	releaseProvider, err := selectors2.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
 		Log.Fatalf("Error selecting release provider\n")
 	}

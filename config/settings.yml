@@ -17,6 +17,18 @@ providers:
       Removed: kind::removal
       Documentation: kind::docs
       Security: kind::security
+  github:
+    labels:
+      Breaking Changes: breaking
+      Added: feature
+      Changed: perf
+      Refactor: refactor
+      Fixed: bugfix
+      Dependencies: dependencies
+      Deprecated: deprecation
+      Removed: removal
+      Documentation: docs
+      Security: security
 releaseProvider: git
 tasksProvider: git
 releasePipes: [ 'semver' ]
