@@ -73,9 +73,9 @@ release:
     - git tag v$(cat VERSION)
     - git push origin HEAD:refs/tags/v$(cat VERSION) --force
     - go get $(go list ./... | grep -v /vendor/)
+    - go run main.go calculate-release --pre SNAPSHOT > VERSION
     - git branch release/prepare-iteration-$(cat VERSION)
     - git checkout release/prepare-iteration-$(cat VERSION)
-    - go run main.go calculate-release --pre SNAPSHOT > VERSION
     - git add VERSION
     - git commit -m "[AUTOMATED] Prepare for next iteration $(cat VERSION)"
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git

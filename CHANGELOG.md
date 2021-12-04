@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...develop)
 
+## [![1.1.1]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.1.0...1.1.1)
+
+### ![Fixed]
+
+- 🐛 [!67](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/67) Fixed logging level always set to ERROR ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!66](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/66) Fixed inclusions_exclusions pipe not working at all ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!65](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/65) Fixed pipes ordering changing after each release parsed ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!64](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/64) Retrieving unreleased tasks already on release with Git provider ([@aoterocom](https://gitlab.com/aoterocom))
+
 ## [![1.1.0]![2021-12-02]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...1.1.0)
 
 ### ![Added]
@@ -77,6 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 [!13](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/13) Fixed forcing specific bump type behaviour on release command ([@aoterocom](https://gitlab.com/aoterocom))
 
 [Unreleased]: https://img.shields.io/badge/-Unreleased-blueviolet?&style=for-the-badge
+[1.1.1]: https://img.shields.io/badge/Release-1.1.1-blueviolet?&style=for-the-badge
+[2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
 [1.1.0]: https://img.shields.io/badge/Release-1.1.0-blueviolet?&style=for-the-badge
 [2021-12-02]: https://img.shields.io/badge/-2021--12--02-white?&style=for-the-badge
 [v1.0.0]: https://img.shields.io/badge/Release-v1.0.0-blueviolet?&style=for-the-badge

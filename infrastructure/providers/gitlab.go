@@ -6,6 +6,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 	application "gitlab.com/aoterocom/changelog-guardian/application/models"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"os"
 	"strconv"
@@ -75,6 +76,7 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 		releaseLink := "https://gitlab.com/" + namespacedRepo + "/-/releases/" + release.Name
 		gitReleases = append(gitReleases, *infrastructure.NewRelease(release.Name, infrastructure.Hash(release.Commit.ID), *release.ReleasedAt, releaseLink))
 	}
+	helpers.ReverseAny(gitReleases)
 	return &gitReleases, nil
 }
 

@@ -22,9 +22,6 @@ type ChangelogGuardianController struct {
 }
 
 func NewChangelogGuardianController(releaseProvider infraInterfaces.Provider, taskProvider infraInterfaces.Provider, releasePipesStr []string, tasksPipesStr []string) (*ChangelogGuardianController, error) {
-	// reversing task and release pipes to start iterating over the last
-	helpers.ReverseAny(releasePipesStr)
-	helpers.ReverseAny(tasksPipesStr)
 
 	var releasePipes []interfaces.ReleasePipe
 	for _, pipeStr := range releasePipesStr {
@@ -95,21 +92,11 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		// Map the release to application layer model
 		appTruncatedRelease := *services.NewModelMapperService().InfraReleaseToApplicationModel(release)
 
-		// If previous release exists, set from to there
-		var releaseTo infra.Release
-		var timeTo *time.Time
-		if i != 0 {
-			releaseTo = release
-			timeTo = &releaseTo.Time
-		} else {
-			timeTo = nil
-		}
-
-		// If next release doesn't exist (Unreleased has not next), set to there
+		// If release is not the first one, 'from' the previous
 		var releaseFrom infra.Release
 		var timeFrom *time.Time
-		if i != len(infraTruncatedReleases)-1 {
-			releaseFrom = infraTruncatedReleases[i+1]
+		if i != 0 {
+			releaseFrom = infraTruncatedReleases[i-1]
 			timeFrom = &releaseFrom.Time
 		} else {
 			if lastRelease != nil {
@@ -121,6 +108,12 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 				timeFrom = nil
 			}
 		}
+
+		// Always search until ('to') the release moment
+		var releaseTo infra.Release
+		var timeTo *time.Time
+		releaseTo = release
+		timeTo = &releaseTo.Time
 
 		// Obtain the tasks between the last release to this one (or to now)
 		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, defaultBranch)
@@ -147,7 +140,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	var from *time.Time
 	var releaseUrl string
 	if len(infraTruncatedReleases) == 0 && len(*releases) != 0 {
-		from = &(*releases)[len(*releases)-1].Time
+		from = &(*releases)[0].Time
 		urlPointer, err := cgc.releaseProvider.ReleaseURL(&(*releases)[0].Name, defaultBranch)
 		releaseUrl = *urlPointer
 		if err != nil {
@@ -223,8 +216,6 @@ func (cgc *ChangelogGuardianController) GetTask(taskId string) (*models.Task, er
 }
 
 func (cgc *ChangelogGuardianController) throughReleasePipes(releases []infra.Release) []infra.Release {
-	// Reverse to start from the first item
-	helpers.ReverseAny(cgc.releasePipes)
 
 	var finalReleases = releases
 	for _, releasePipe := range cgc.releasePipes {
@@ -243,8 +234,6 @@ func (cgc *ChangelogGuardianController) throughReleasePipes(releases []infra.Rel
 }
 
 func (cgc *ChangelogGuardianController) throughTasksPipes(tasks []infra.Task) []infra.Task {
-	// Reverse to start from the first item
-	helpers.ReverseAny(cgc.tasksPipes)
 
 	var finalTasks = tasks
 	for _, tasksPipe := range cgc.tasksPipes {
