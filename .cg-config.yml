@@ -1,7 +1,7 @@
 releaseProvider: gitlab
 tasksProvider: gitlab
 template: stylish_markdown
-tasksPipes: [ 'gitlab_resolver', 'natural_language' ]
+tasksPipes: [ 'gitlab_resolver', 'natural_language', 'inclusions_exclusions' ]
 tasksPipesCfg:
   inclusions_exclusions:
     labels:
