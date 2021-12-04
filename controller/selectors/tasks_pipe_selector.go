@@ -17,6 +17,9 @@ func TasksPipeSelector(providerStr string) (*interfaces.TasksPipe, error) {
 	case "conventional_commits":
 		prov := interfaces.TasksPipe(tasksPipes.NewConventionalCommitsTasksPipe())
 		return &prov, nil
+	case "inclusions_exclusions":
+		prov := interfaces.TasksPipe(tasksPipes.NewInclusionsExclusionsTasksPipe())
+		return &prov, nil
 	default:
 		return nil, errors.Errorf("unknown task pipe " + providerStr)
 	}

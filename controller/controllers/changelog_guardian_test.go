@@ -68,9 +68,8 @@ func TestChangelogGuardianController_throughTasksPipes(t *testing.T) {
 		{
 			name: "Test task pipeing",
 			fields: fields{tasksPipes: []interfaces2.TasksPipe{
-				// Need to go in reverse order!!
-				interfaces2.TasksPipe(&middleware2.NaturalLanguageTasksPipe{}),
 				interfaces2.TasksPipe(&middleware2.GitlabResolverTasksPipe{}),
+				interfaces2.TasksPipe(&middleware2.NaturalLanguageTasksPipe{}),
 			}},
 			args: args{
 				tasks: []infra.Task{

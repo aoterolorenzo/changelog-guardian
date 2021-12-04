@@ -36,12 +36,12 @@ type GlobalSettings struct {
 		} `yaml:"conventional_commits"`
 		InclusionsExclusions struct {
 			Labels struct {
-				Inclusions []string
-				Exclusions []string
+				Inclusions []string `yaml:"included"`
+				Exclusions []string `yaml:"excluded"`
 			} `yaml:"labels"`
 			Paths struct {
-				Inclusions []string
-				Exclusions []string
+				Inclusions []string `yaml:"included"`
+				Exclusions []string `yaml:"excluded"`
 			} `yaml:"paths"`
 		} `yaml:"inclusions_exclusions"`
 	} `yaml:"tasksPipesCfg"`
