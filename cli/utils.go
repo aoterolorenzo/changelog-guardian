@@ -4,6 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
+	"strconv"
 )
 
 func PreCommandChecks(cmd *cobra.Command, args []string) {
@@ -16,8 +17,8 @@ func PreCommandChecks(cmd *cobra.Command, args []string) {
 		Settings.CGConfigPath = argConfigFile
 	}
 
-	argSilent := cmd.Flag("silent").Value.String()
-	if argSilent != "" {
+	argSilent, _ := strconv.ParseBool(cmd.Flag("silent").Value.String())
+	if argSilent {
 		Log.SetLevel(log.ErrorLevel)
 	}
 }
