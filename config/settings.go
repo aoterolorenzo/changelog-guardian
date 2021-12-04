@@ -25,6 +25,9 @@ type GlobalSettings struct {
 		Gitlab struct {
 			Labels map[models.Category]string `yaml:"labels"`
 		} `yaml:"gitlab"`
+		Github struct {
+			Labels map[models.Category]string `yaml:"labels"`
+		} `yaml:"github"`
 	} `yaml:"providers"`
 	ReleaseProvider string   `yaml:"releaseProvider"`
 	TasksProvider   string   `yaml:"tasksProvider"`

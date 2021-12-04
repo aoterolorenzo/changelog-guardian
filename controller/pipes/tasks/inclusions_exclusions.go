@@ -69,13 +69,13 @@ func (tf *InclusionsExclusionsTasksPipe) Filter(task *infra.Task) (*infra.Task, 
 
 	if !addressedLabelInclusions {
 		settings.Log.Debug("Task skipped: task label not between inclusion labels")
-	} else if addressedLabelExclusions {
+	} else if !addressedLabelExclusions {
 		settings.Log.Debug("Task skipped: task label in exclusion labels")
 	}
 
 	if !addressedPathInclusions {
 		settings.Log.Debug("Task skipped: task file path not between inclusion paths")
-	} else if addressedPathExclusions {
+	} else if !addressedPathExclusions {
 		settings.Log.Debug("Task skipped: task file path in exclusion paths")
 	}
 
