@@ -11,6 +11,7 @@ import (
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -66,7 +67,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	// If there is a release from where to search, we truncate the releases obtained just from it
 	if lastRelease != nil {
 		for i, release := range *releases {
-			if release.Name == lastRelease.Version {
+			if strings.TrimPrefix(release.Name, "v") == strings.TrimPrefix(lastRelease.Version, "v") {
 				helpers.ReverseAny(*releases)
 				if len((*releases)[:i+1]) == 1 {
 					infraTruncatedReleases = []infra.Release{}
