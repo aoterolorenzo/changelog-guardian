@@ -73,7 +73,7 @@ release:
     - git tag v$(cat VERSION)
     - git push origin HEAD:refs/tags/v$(cat VERSION) --force
     - go get $(go list ./... | grep -v /vendor/)
-    - go run main.go calculate-release --pre SNAPSHOT > VERSION
+    - go run main.go calculate-release --minor --pre SNAPSHOT > VERSION
     - git branch release/prepare-iteration-$(cat VERSION)
     - git checkout release/prepare-iteration-$(cat VERSION)
     - git add VERSION
