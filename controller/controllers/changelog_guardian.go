@@ -22,9 +22,6 @@ type ChangelogGuardianController struct {
 }
 
 func NewChangelogGuardianController(releaseProvider infraInterfaces.Provider, taskProvider infraInterfaces.Provider, releasePipesStr []string, tasksPipesStr []string) (*ChangelogGuardianController, error) {
-	// reversing task and release pipes to start iterating over the last
-	helpers.ReverseAny(releasePipesStr)
-	helpers.ReverseAny(tasksPipesStr)
 
 	var releasePipes []interfaces.ReleasePipe
 	for _, pipeStr := range releasePipesStr {
@@ -219,8 +216,6 @@ func (cgc *ChangelogGuardianController) GetTask(taskId string) (*models.Task, er
 }
 
 func (cgc *ChangelogGuardianController) throughReleasePipes(releases []infra.Release) []infra.Release {
-	// Reverse to start from the first item
-	helpers.ReverseAny(cgc.releasePipes)
 
 	var finalReleases = releases
 	for _, releasePipe := range cgc.releasePipes {
@@ -239,8 +234,6 @@ func (cgc *ChangelogGuardianController) throughReleasePipes(releases []infra.Rel
 }
 
 func (cgc *ChangelogGuardianController) throughTasksPipes(tasks []infra.Task) []infra.Task {
-	// Reverse to start from the first item
-	helpers.ReverseAny(cgc.tasksPipes)
 
 	var finalTasks = tasks
 	for _, tasksPipe := range cgc.tasksPipes {
