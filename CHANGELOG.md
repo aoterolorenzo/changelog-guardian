@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...develop)
+## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.1.1...develop)
+
+## [![1.2.0]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.1.1...1.2.0)
+
+### ![Added]
+
+- ✨ [!70](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/70) Added Github as new provider ([@aoterocom](https://gitlab.com/aoterocom))
+
+### ![Fixed]
+
+- 🐛 [!73](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/73) Task from older releases coming up at release time ([@aoterocom](https://gitlab.com/aoterocom))
 
 ## [![1.1.1]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.1.0...1.1.1)
 
@@ -85,13 +95,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 [!16](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/16) Fixed Gitlab provider tests ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!13](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/13) Fixed forcing specific bump type behaviour on release command ([@aoterocom](https://gitlab.com/aoterocom))
 
+## [![v1.1.1]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.1.1)
+
+### ![Fixed]
+
+- 🐛 [!67](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/67) Fixed logging level always set to ERROR ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!66](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/66) Fixed inclusions_exclusions pipe not working at all ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!65](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/65) Fixed pipes ordering changing after each release parsed ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!64](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/64) Retrieving unreleased tasks already on release with Git provider ([@aoterocom](https://gitlab.com/aoterocom))
+
 [Unreleased]: https://img.shields.io/badge/-Unreleased-blueviolet?&style=for-the-badge
+[1.2.0]: https://img.shields.io/badge/Release-1.2.0-blueviolet?&style=for-the-badge
+[2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
 [1.1.1]: https://img.shields.io/badge/Release-1.1.1-blueviolet?&style=for-the-badge
 [2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
 [1.1.0]: https://img.shields.io/badge/Release-1.1.0-blueviolet?&style=for-the-badge
 [2021-12-02]: https://img.shields.io/badge/-2021--12--02-white?&style=for-the-badge
 [v1.0.0]: https://img.shields.io/badge/Release-v1.0.0-blueviolet?&style=for-the-badge
 [2021-11-25]: https://img.shields.io/badge/-2021--11--25-white?&style=for-the-badge
+[v1.1.1]: https://img.shields.io/badge/Release-v1.1.1-blueviolet?&style=for-the-badge
+[2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
 [Added]: https://img.shields.io/badge/-ADDED-5ccb31.svg?&style=flat-square
 [Breaking Changes]: https://img.shields.io/badge/-BREAKING+CHANGES-f70000.svg?&style=flat-square
 [Changed]: https://img.shields.io/badge/-CHANGED-31cb7d.svg?&style=flat-square

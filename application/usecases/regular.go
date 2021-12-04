@@ -8,6 +8,7 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/application/services"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
+	infraSelectors "gitlab.com/aoterocom/changelog-guardian/infrastructure/selectors"
 )
 
 func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
@@ -24,13 +25,13 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 	}
 
 	Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
-	releaseProvider, err := selectors.ProviderSelector(Settings.ReleaseProvider)
+	releaseProvider, err := infraSelectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
 		Log.Fatalf("Error selecting release provider\n")
 	}
 
 	Log.Debugf("Tasks provider: %s\n", Settings.TasksProvider)
-	tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
+	tasksProvider, err := infraSelectors.ProviderSelector(Settings.TasksProvider)
 	if err != nil {
 		Log.Fatalf("Error selecting tasks provider\n")
 	}

@@ -10,6 +10,7 @@ import (
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
+	selectors2 "gitlab.com/aoterocom/changelog-guardian/infrastructure/selectors"
 	"strconv"
 )
 
@@ -41,7 +42,7 @@ func InsertCmd(cmd *cobra.Command, args []string) {
 	var taskFromProvider = &models.Task{}
 	if !argSkipAutocompletion {
 		Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
-		tasksProvider, err := selectors.ProviderSelector(Settings.TasksProvider)
+		tasksProvider, err := selectors2.ProviderSelector(Settings.TasksProvider)
 		if err != nil {
 			Log.Fatalf("Error selecting release provider\n")
 		}

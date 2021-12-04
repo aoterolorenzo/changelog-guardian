@@ -40,6 +40,18 @@ providers: # Internal configuration of the Changelog Guardian providers
       Removed: kind::removal
       Documentation: kind::docs
       Security: kind::security
+  github:
+    labels:
+      Breaking Changes: breaking
+      Added: feature
+      Changed: perf
+      Refactor: refactor
+      Fixed: bugfix
+      Dependencies: dependencies
+      Deprecated: deprecation
+      Removed: removal
+      Documentation: docs
+      Security: security
 releaseProvider: git # Release provider
 tasksProvider: git # Tasks provider
 template: markdown # Changelog template (theming)
@@ -88,7 +100,7 @@ Changelog Guardian implements different providers for both releases and tasks. T
 
 Obtains the releases and the project versioning from the git repository tags.
 
-#### Git task provider
+#### Git tasks provider
 
 Each commit is a task. This seems for ninjas, but can be very optimized with task Pipes
 
@@ -96,12 +108,23 @@ Each commit is a task. This seems for ninjas, but can be very optimized with tas
 
 Releases are obtained from the [Gitlab Releases](https://about.gitlab.com/releases/categories/releases/) from your project.
 
-* NOTE: Gitlab automatically detects your repo from the git remotes. No further configuration needed. 
+* NOTE: Gitlab automatically detects your repo from the git remotes. No further configuration needed.
 * NOTE: If you need to access to a _private repository_, just set the environment variable `GITLAB_TOKEN` with a Personal Access Token
 
-#### Gitlab task provider
+#### Gitlab tasks provider
 
-Fetch already merged Merge Requests as tasks. Remember that you can customize your configuration to modify the labels you will use.
+Fetches already merged Merge Requests as tasks. Remember that you can customize your configuration to modify the labels you will use.
+
+#### GitHub release provider
+
+Releases are obtained from the [Github Releases](https://docs.github.com/es/repositories/releasing-projects-on-github/about-releases) from your project.
+
+* NOTE: GitHub automatically detects your repo from the git remotes. No further configuration needed.
+* NOTE: You will need to set the environment variable `GITHUB_TOKEN` with a Personal Access Token.
+
+#### GitHub tasks provider
+
+As the GitHub tasks provider, it fetches already merged Merge Requests as tasks. Remember that you can customize your configuration to modify the labels you will use.
 
 ### Pipes
 

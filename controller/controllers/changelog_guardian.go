@@ -11,6 +11,7 @@ import (
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -66,12 +67,12 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	// If there is a release from where to search, we truncate the releases obtained just from it
 	if lastRelease != nil {
 		for i, release := range *releases {
-			if release.Name == lastRelease.Version {
+			if strings.TrimPrefix(release.Name, "v") == strings.TrimPrefix(lastRelease.Version, "v") {
 				helpers.ReverseAny(*releases)
 				if len((*releases)[:i+1]) == 1 {
 					infraTruncatedReleases = []infra.Release{}
 				} else {
-					infraTruncatedReleases = (*releases)[:i+1]
+					infraTruncatedReleases = (*releases)[:(len(*releases) - i)]
 				}
 				break
 			}
@@ -116,12 +117,13 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		timeTo = &releaseTo.Time
 
 		// Obtain the tasks between the last release to this one (or to now)
-		tasks, err := cgc.releaseProvider.GetTasks(timeFrom, timeTo, defaultBranch)
+		settings.Log.Infof("Retieving tasks for Release %s...", release.Name)
+		tasks, err := cgc.taskProvider.GetTasks(timeFrom, timeTo, defaultBranch)
 		if err != nil {
 			return nil, err
 		}
 
-		settings.Log.Debugf("Retrieved %s tasks for Release %s\n", strconv.Itoa(len(*tasks)), release.Name)
+		settings.Log.WithField("release", release.Name).Debugf("Retrieved %s tasks", strconv.Itoa(len(*tasks)))
 		// Pass tasks through Task Pipes
 		*tasks = cgc.throughTasksPipes(*tasks)
 
@@ -169,7 +171,11 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		}
 	}
 
-	unreleasedTasks, _ := cgc.taskProvider.GetTasks(from, nil, defaultBranch)
+	settings.Log.Debugf("Retieving unreleased tasks...")
+	unreleasedTasks, err := cgc.taskProvider.GetTasks(from, nil, defaultBranch)
+	if err != nil {
+		settings.Log.WithField("error", err.Error()).Errorf("Error retrieving unreleased tasks\n")
+	}
 	settings.Log.Debugf("Retieved %d new unreleased tasks\n", len(*unreleasedTasks))
 
 	// Pass tasks through Task Pipes

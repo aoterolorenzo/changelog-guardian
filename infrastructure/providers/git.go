@@ -8,6 +8,7 @@ import (
 	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -60,6 +61,10 @@ func (gc *GitProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastru
 	if err != nil {
 		return nil, err
 	}
+
+	sort.SliceStable(tags, func(i, j int) bool {
+		return tags[i].Time.Unix() < tags[j].Time.Unix()
+	})
 
 	return &tags, nil
 }
