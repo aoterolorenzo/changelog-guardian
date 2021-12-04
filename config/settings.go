@@ -66,7 +66,7 @@ func init() {
 	Log.Debugf("Retrieving settings from %s...\n", Settings.CGConfigPath)
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
 	if err != nil {
-		Log.Debugf("File %s not available. Skilling\n", Settings.CGConfigPath)
+		Log.WithError(err).Debugf("File %s not available. Skipping\n", Settings.CGConfigPath)
 	} else {
 		if err := extractSettings(string(yamlFile)); err != nil {
 			log.Panicln(err)

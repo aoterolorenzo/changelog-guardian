@@ -30,13 +30,13 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		Log.Fatalf("Error selecting template\n")
+		Log.WithError(err).Fatalf("Error selecting template\n")
 	}
 
 	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		Log.Errorf("Changelog not found at %s\n", Settings.ChangelogPath)
+		Log.WithError(err).Errorf("Changelog not found at %s\n", Settings.ChangelogPath)
 		return
 	}
 
@@ -80,7 +80,7 @@ func ReleaseNotesCmd(cmd *cobra.Command, args []string) {
 
 				err = helpers.SaveStringToFile(Settings.ReleaseNotesPath, releaseNotes)
 				if err != nil {
-					Log.Fatalf("Error saving changelog file on %s\n", Settings.ReleaseNotesPath)
+					Log.WithError(err).Fatalf("Error saving changelog file on %s\n", Settings.ReleaseNotesPath)
 				}
 
 				Log.Infof("Release Notes saved on %s\n", Settings.ReleaseNotesPath)

@@ -19,12 +19,12 @@ func YankCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		Log.Fatalf("Error selecting template\n")
+		Log.WithError(err).Fatalf("Error selecting template\n")
 	}
 
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		Log.Errorf("Changelog not found at %s\n", Settings.ChangelogPath)
+		Log.WithError(err).Errorf("Changelog not found at %s\n", Settings.ChangelogPath)
 		return
 	}
 
@@ -71,7 +71,7 @@ func YankCmd(cmd *cobra.Command, args []string) {
 	}
 	err = (*changelogService).SaveChangelog(*localChangelog, Settings.ChangelogPath)
 	if err != nil {
-		Log.Fatalf("Error saving changelog file\n")
+		Log.WithError(err).Fatalf("Error saving changelog file\n")
 	}
 
 	Log.Infof("Changelog saved\n")

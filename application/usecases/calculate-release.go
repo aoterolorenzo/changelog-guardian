@@ -25,13 +25,13 @@ func CalculateReleaseCmd(cmd *cobra.Command, args []string) {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		Log.Fatalf("Error selecting template\n")
+		Log.WithError(err).Fatalf("Error selecting template\n")
 	}
 
 	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	changelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		Log.Fatalf("Error retrieving changelog file\n")
+		Log.WithError(err).Fatalf("Error retrieving changelog file\n")
 	}
 
 	// Load args:
