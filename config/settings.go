@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"fmt"
 	"github.com/imdario/mergo"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gopkg.in/yaml.v3"
@@ -37,6 +38,10 @@ type GlobalSettings struct {
 		ConventionalCommits struct {
 			Categories map[models.Category]string `yaml:"categories"`
 		} `yaml:"conventional_commits"`
+		Jira struct {
+			BaseUrl string `yaml:"baseUrl"`
+			REGEX   string `yaml:"regex"`
+		} `yaml:"jira"`
 		InclusionsExclusions struct {
 			Labels struct {
 				Inclusions []string `yaml:"included"`
@@ -65,6 +70,8 @@ func init() {
 
 	Log.Debugf("Retrieving settings from %s...\n", Settings.CGConfigPath)
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
+	fmt.Println(Settings.CGConfigPath)
+	fmt.Println(yamlFile)
 	if err != nil {
 		Log.WithError(err).Debugf("File %s not available. Skipping\n", Settings.CGConfigPath)
 	} else {

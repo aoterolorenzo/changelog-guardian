@@ -50,6 +50,9 @@ tasksPipesCfg:
     paths:
       excluded: [ ]
       included: [ '*all' ]
+  jira:
+    regex: "\\[(?P<key>[A-Z]{2,}[-]{1,}\\d+)]"
+    baseUrl: "https://aoterocom.atlassian.net/"
 initialVersion: 0.1.0
 templatesCfg:
   stylish_markdown:
