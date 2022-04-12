@@ -2,11 +2,10 @@ package services
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
-	"golang.org/x/oauth2"
-	jiraOauth "golang.org/x/oauth2/jira"
 	jira "gopkg.in/andygrunwald/go-jira.v1"
 	"os"
 )
@@ -20,44 +19,32 @@ type JiraService struct {
 func NewJiraService() *JiraService {
 	return &JiraService{
 		user:    os.Getenv("JIRA_USER"),
-		token:   os.Getenv("JIRA_TOKEN"),
+		token:   os.Getenv("JIRA_API_TOKEN"),
 		baseUrl: settings.Settings.TasksPipesCfg.Jira.BaseUrl,
 	}
 }
 
 func (jc JiraService) GetTask(taskId string) (infra.Task, error) {
 
-	var (
-		jiraURL = settings.Settings.TasksPipesCfg.Jira.BaseUrl
-	)
+	var jiraURL = settings.Settings.TasksPipesCfg.Jira.BaseUrl
 
-	var conf = jiraOauth.Config{
-		BaseURL: jiraURL,
-		Subject: "urn:atlassian:connect:useraccountid:623df10b8d8b9c0068b9b21e",
-		Config: oauth2.Config{
-			ClientID:     "qYLJ1eAUnchVsYjUS5S5L8CVRpehCHUg",
-			ClientSecret: "XunzfAxgg6nW52BFoJOlDtgrHIAIXvnIgQ_ibwakf1S2SV4F9tu0v3I4v8hPAsCT",
-			Endpoint: oauth2.Endpoint{
-				AuthURL:   "https://auth.atlassian.com/authorize",
-				TokenURL:  "https://auth.atlassian.com/oauth/token",
-				AuthStyle: 0,
-			},
-			RedirectURL: "https://aoterocom.atlassian.com/",
-			Scopes:      []string{"read", "write"},
-		},
+	tp := jira.BasicAuthTransport{
+		Username: jc.user,
+		Password: jc.token,
 	}
 
-	fmt.Println("get task " + taskId)
-
-	jiraClient, err := jira.NewClient(conf.Client(nil), jc.baseUrl+"jira/")
+	client, err := jira.NewClient(tp.Client(), jiraURL)
+	issue, res, err := client.Issue.Get(taskId, nil)
 	if err != nil {
 		return infra.Task{}, err
 	}
 
-	issue, res, err := jiraClient.Issue.Get(taskId, nil)
+	if res.StatusCode != 200 {
+		return infra.Task{}, errors.New(fmt.Sprintf("error retrieving the task. status code %d", res.StatusCode))
+	}
 
-	fmt.Println(res)
-	fmt.Println(issue)
+	issue, res, err = client.Issue.Get(taskId, nil)
+
 	if err != nil {
 		return infra.Task{}, err
 	}
