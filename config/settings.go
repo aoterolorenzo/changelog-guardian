@@ -37,6 +37,10 @@ type GlobalSettings struct {
 		ConventionalCommits struct {
 			Categories map[models.Category]string `yaml:"categories"`
 		} `yaml:"conventional_commits"`
+		Jira struct {
+			BaseUrl string `yaml:"baseUrl"`
+			REGEX   string `yaml:"regex"`
+		} `yaml:"jira"`
 		InclusionsExclusions struct {
 			Labels struct {
 				Inclusions []string `yaml:"included"`
