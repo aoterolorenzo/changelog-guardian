@@ -6,3 +6,5 @@ tasksPipesCfg:
   inclusions_exclusions:
     labels:
       excluded: [ 'scope::internal' ]
+  jira:
+    baseUrl: "https://aoterocom.atlassian.net/"
