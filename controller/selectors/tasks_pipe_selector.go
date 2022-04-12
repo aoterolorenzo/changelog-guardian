@@ -20,6 +20,9 @@ func TasksPipeSelector(providerStr string) (*interfaces.TasksPipe, error) {
 	case "inclusions_exclusions":
 		prov := interfaces.TasksPipe(tasksPipes.NewInclusionsExclusionsTasksPipe())
 		return &prov, nil
+	case "jira":
+		prov := interfaces.TasksPipe(tasksPipes.NewJiraTasksPipe())
+		return &prov, nil
 	default:
 		return nil, errors.Errorf("unknown task pipe " + providerStr)
 	}

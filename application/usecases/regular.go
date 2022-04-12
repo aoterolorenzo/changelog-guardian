@@ -21,30 +21,30 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 	Log.Debugf("Using %s template\n", Settings.Template)
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
-		Log.Fatalf("Error selecting template\n")
+		Log.WithError(err).Fatalf("Error selecting template\n")
 	}
 
 	Log.Debugf("Release provider: %s\n", Settings.ReleaseProvider)
 	releaseProvider, err := infraSelectors.ProviderSelector(Settings.ReleaseProvider)
 	if err != nil {
-		Log.Fatalf("Error selecting release provider\n")
+		Log.WithError(err).Fatalf("Error selecting release provider\n")
 	}
 
 	Log.Debugf("Tasks provider: %s\n", Settings.TasksProvider)
 	tasksProvider, err := infraSelectors.ProviderSelector(Settings.TasksProvider)
 	if err != nil {
-		Log.Fatalf("Error selecting tasks provider\n")
+		Log.WithError(err).Fatalf("Error selecting tasks provider\n")
 	}
 
 	cgController, err := controllers.NewChangelogGuardianController(*releaseProvider, *tasksProvider, Settings.ReleasePipes, Settings.TasksPipes)
 	if err != nil {
-		Log.Fatalf("Error creating controller\n")
+		Log.WithError(err).Fatalf("Error creating controller\n")
 	}
 
 	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
 	localChangelog, err := (*changelogService).Parse(Settings.ChangelogPath)
 	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		Log.Fatalf("Error retrieving changelog file\n")
+		Log.WithError(err).Fatalf("Error retrieving changelog file\n")
 	}
 
 	var lastRelease *models.Release
@@ -63,9 +63,9 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 
 	releases, err := cgController.GetFilledReleasesFromInfra(lastRelease, Settings.MainBranch, Settings.DevelopBranch)
 	if err != nil && err.Error() == "repository does not exist" {
-		Log.Fatalf("No git repository found on this path")
+		Log.WithError(err).Fatalf("No git repository found on this path")
 	} else if err != nil {
-		Log.Fatalf(err.Error())
+		Log.WithError(err).Fatalf(err.Error())
 	}
 	retrievedChangelog := models.NewChangelog()
 	retrievedChangelog.Releases = *releases
@@ -101,7 +101,7 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 	}
 	err = (*changelogService).SaveChangelog(*retrievedChangelog, Settings.ChangelogPath)
 	if err != nil {
-		Log.Fatalf("Error saving changelog file\n")
+		Log.WithError(err).Fatalf("Error saving changelog file\n")
 	}
 
 	Log.Infof("Changelog saved\n")

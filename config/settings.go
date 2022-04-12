@@ -37,6 +37,11 @@ type GlobalSettings struct {
 		ConventionalCommits struct {
 			Categories map[models.Category]string `yaml:"categories"`
 		} `yaml:"conventional_commits"`
+		Jira struct {
+			BaseUrl string                     `yaml:"baseUrl"`
+			REGEX   string                     `yaml:"regex"`
+			Labels  map[models.Category]string `yaml:"labels"`
+		} `yaml:"jira"`
 		InclusionsExclusions struct {
 			Labels struct {
 				Inclusions []string `yaml:"included"`
@@ -66,7 +71,7 @@ func init() {
 	Log.Debugf("Retrieving settings from %s...\n", Settings.CGConfigPath)
 	yamlFile, err := ioutil.ReadFile(Settings.CGConfigPath)
 	if err != nil {
-		Log.Debugf("File %s not available. Skilling\n", Settings.CGConfigPath)
+		Log.WithError(err).Debugf("File %s not available. Skipping\n", Settings.CGConfigPath)
 	} else {
 		if err := extractSettings(string(yamlFile)); err != nil {
 			log.Panicln(err)

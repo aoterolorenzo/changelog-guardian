@@ -5,9 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.1.1...develop)
+## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...develop)
 
-## [![1.2.0]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.1.1...1.2.0)
+## [![1.3.0]![2022-04-12]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.2.0...1.3.0)
+
+### ![Added]
+
+- ✨ [!79](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/79) Implemented Jira tasks pipe ([@aoterocom](https://gitlab.com/aoterocom))
+
+### ![Changed]
+
+- ✒️ [!76](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/76) Improved logging joining the errors as attached fields ([@aoterocom](https://gitlab.com/aoterocom))
+
+### ![Fixed]
+
+- 🐛 [!82](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/82) Error parsing git remotes ssh links to grab Github namespace and repository ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!81](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/81) Fixed CHANGELOG.md ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!80](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/80) Unreleased section update problems when using main command ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!77](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/77) Fixed Github task labels retrieving ([@aoterocom](https://gitlab.com/aoterocom))
+
+## [![v1.2.0]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.2.0)
 
 ### ![Added]
 
@@ -17,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 🐛 [!73](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/73) Task from older releases coming up at release time ([@aoterocom](https://gitlab.com/aoterocom))
 
-## [![1.1.1]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.1.0...1.1.1)
+## [![v1.1.1]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.1.1)
 
 ### ![Fixed]
 
@@ -26,21 +43,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 [!65](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/65) Fixed pipes ordering changing after each release parsed ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!64](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/64) Retrieving unreleased tasks already on release with Git provider ([@aoterocom](https://gitlab.com/aoterocom))
 
-## [![1.1.0]![2021-12-02]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...1.1.0)
+## [![v1.1.0]![2021-12-02]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.1.0)
 
 ### ![Added]
 
-- ✨ [!39](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/39) Added INSTALL.sh ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!37](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/37) Enable and implement CLI args ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!36](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/36) Added calculate-release command ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!35](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/35) Added versioning system ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!34](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/34) Added Exclusions tasks pipe ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!32](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/32) Added Conventional Commits pipe ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!31](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/31) Implemented logging system ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!25](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/25) Prepare release flow ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!28](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/28) Allow different input and output templates ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!27](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/27) Add release-notes command ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!26](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/26) Add stylish_markdown style template ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!27](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/27) Added release-notes command ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!26](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/26) Added stylish_markdown style template ([@aoterocom](https://gitlab.com/aoterocom))
 
 ### ![Documentation]
 
@@ -49,9 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ![Fixed]
 
-- 🐛 [!41](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/41) Added .gitignore and remove .idea folder ლ(ಠ_ಠლ) ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!38](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/38) Update Unreleased references to unify nomenclature ([@aoterocom](https://gitlab.com/aoterocom))
-- 🐛 [!29](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/29) Fix release titles on stylish_markdown template ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!29](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/29) Fixed release titles on stylish_markdown template ([@aoterocom](https://gitlab.com/aoterocom))
 
 ### ![Refactor]
 
@@ -62,12 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ![Added]
 
-- ✨ [!28](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/28) Allow different input and output templates ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!27](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/27) Added release-notes command ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!26](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/26) Added stylish_markdown style template ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!19](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/19) Rebrand middleware / filters into Pipes ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!17](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/17) Abstract Changelog classes to allow different changelog styles ([@aoterocom](https://gitlab.com/aoterocom))
-- ✨ [!15](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/15) Added CI job for PR-verify ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!14](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/14) Added yanked command ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!12](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/12) Added insert command ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!11](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/11) Added CHANGELOG.md generated by Changelog Guardian ([@aoterocom](https://gitlab.com/aoterocom))
@@ -89,32 +97,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ![Fixed]
 
-- 🐛 [!29](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/29) Fixed release titles on stylish_markdown template ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!20](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/20) Fixed setting's internal Gitlab provider labels ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!18](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/18) Fixed MergeReleases function to add retrieved releases above in desc order ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!16](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/16) Fixed Gitlab provider tests ([@aoterocom](https://gitlab.com/aoterocom))
 - 🐛 [!13](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/13) Fixed forcing specific bump type behaviour on release command ([@aoterocom](https://gitlab.com/aoterocom))
 
-## [![v1.1.1]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.1.1)
+### ![Refactor]
 
-### ![Fixed]
-
-- 🐛 [!67](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/67) Fixed logging level always set to ERROR ([@aoterocom](https://gitlab.com/aoterocom))
-- 🐛 [!66](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/66) Fixed inclusions_exclusions pipe not working at all ([@aoterocom](https://gitlab.com/aoterocom))
-- 🐛 [!65](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/65) Fixed pipes ordering changing after each release parsed ([@aoterocom](https://gitlab.com/aoterocom))
-- 🐛 [!64](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/64) Retrieving unreleased tasks already on release with Git provider ([@aoterocom](https://gitlab.com/aoterocom))
+- 🏗 [!19](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/19) Rebrand middleware / filters into Pipes ([@aoterocom](https://gitlab.com/aoterocom))
 
 [Unreleased]: https://img.shields.io/badge/-Unreleased-blueviolet?&style=for-the-badge
-[1.2.0]: https://img.shields.io/badge/Release-1.2.0-blueviolet?&style=for-the-badge
+[1.3.0]: https://img.shields.io/badge/Release-1.3.0-blueviolet?&style=for-the-badge
+[2022-04-12]: https://img.shields.io/badge/-2022--04--12-white?&style=for-the-badge
+[v1.2.0]: https://img.shields.io/badge/Release-v1.2.0-blueviolet?&style=for-the-badge
 [2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
-[1.1.1]: https://img.shields.io/badge/Release-1.1.1-blueviolet?&style=for-the-badge
+[v1.1.1]: https://img.shields.io/badge/Release-v1.1.1-blueviolet?&style=for-the-badge
 [2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
-[1.1.0]: https://img.shields.io/badge/Release-1.1.0-blueviolet?&style=for-the-badge
+[v1.1.0]: https://img.shields.io/badge/Release-v1.1.0-blueviolet?&style=for-the-badge
 [2021-12-02]: https://img.shields.io/badge/-2021--12--02-white?&style=for-the-badge
 [v1.0.0]: https://img.shields.io/badge/Release-v1.0.0-blueviolet?&style=for-the-badge
 [2021-11-25]: https://img.shields.io/badge/-2021--11--25-white?&style=for-the-badge
-[v1.1.1]: https://img.shields.io/badge/Release-v1.1.1-blueviolet?&style=for-the-badge
-[2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
 [Added]: https://img.shields.io/badge/-ADDED-5ccb31.svg?&style=flat-square
 [Breaking Changes]: https://img.shields.io/badge/-BREAKING+CHANGES-f70000.svg?&style=flat-square
 [Changed]: https://img.shields.io/badge/-CHANGED-31cb7d.svg?&style=flat-square

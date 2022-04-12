@@ -165,7 +165,7 @@ func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		var labelStrings []string
 		labels := pullRequest.Labels
 		for _, label := range labels {
-			labelStrings = append(labelStrings, label.String())
+			labelStrings = append(labelStrings, *label.Name)
 		}
 
 		var fileChanges []string
@@ -318,7 +318,10 @@ func (gp *GithubProvider) namespacedRepo() (*string, error) {
 	*currentGitBAseUrl = strings.Replace(*currentGitBAseUrl, ".git", "", 1)
 	namespacedRepoSliced := strings.Split(*currentGitBAseUrl, "github.com/")
 	if len(namespacedRepoSliced) <= 1 {
-		Log.Fatalf("Unable to retrieve github repo/namespace from git origin")
+		namespacedRepoSliced = strings.Split(*currentGitBAseUrl, "github.com:")
+		if len(namespacedRepoSliced) <= 1 {
+			Log.Fatalf("Unable to retrieve github repo/namespace from git origin")
+		}
 	}
 	namespacedRepo := namespacedRepoSliced[1]
 
