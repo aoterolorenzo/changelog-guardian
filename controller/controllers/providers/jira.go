@@ -49,13 +49,22 @@ func (jc JiraController) GetTask(taskId string) (*infra.Task, error) {
 		return &infra.Task{}, err
 	}
 
+	var authorName string
+	var authorLink string
+	author := issue.Fields.Assignee
+	if author == nil {
+		author = issue.Fields.Creator
+	}
+	authorName = author.DisplayName
+	authorLink = jc.baseUrl + "/jira/people/" + author.AccountID
+
 	return &infra.Task{
 		ID:         issue.Key,
 		Name:       issue.Fields.Summary,
 		Link:       jc.baseUrl + "/browse/" + issue.Key,
-		Title:      issue.Key,
-		Author:     issue.Fields.Creator.DisplayName,
-		AuthorLink: jc.baseUrl + "/jira/people/" + issue.Fields.Creator.AccountID,
+		Title:      issue.Fields.Summary,
+		Author:     authorName,
+		AuthorLink: authorLink,
 		Category:   jc.inferCategory(issue.Fields.Labels, issue.Fields.Type),
 	}, nil
 }
