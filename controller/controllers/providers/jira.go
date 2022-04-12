@@ -1,4 +1,4 @@
-package services
+package providers
 
 import (
 	"fmt"
@@ -10,21 +10,21 @@ import (
 	"os"
 )
 
-type JiraService struct {
+type JiraController struct {
 	user    string
 	token   string
 	baseUrl string
 }
 
-func NewJiraService() *JiraService {
-	return &JiraService{
+func NewJiraController() *JiraController {
+	return &JiraController{
 		user:    os.Getenv("JIRA_USER"),
 		token:   os.Getenv("JIRA_API_TOKEN"),
 		baseUrl: settings.Settings.TasksPipesCfg.Jira.BaseUrl,
 	}
 }
 
-func (jc JiraService) GetTask(taskId string) (infra.Task, error) {
+func (jc JiraController) GetTask(taskId string) (*infra.Task, error) {
 
 	var jiraURL = settings.Settings.TasksPipesCfg.Jira.BaseUrl
 
@@ -36,19 +36,19 @@ func (jc JiraService) GetTask(taskId string) (infra.Task, error) {
 	client, err := jira.NewClient(tp.Client(), jiraURL)
 	issue, res, err := client.Issue.Get(taskId, nil)
 	if err != nil {
-		return infra.Task{}, err
+		return &infra.Task{}, err
 	}
 
 	if res.StatusCode != 200 {
-		return infra.Task{}, errors.New(fmt.Sprintf("error retrieving the task. status code %d", res.StatusCode))
+		return &infra.Task{}, errors.New(fmt.Sprintf("error retrieving the task. status code %d", res.StatusCode))
 	}
 
 	issue, res, err = client.Issue.Get(taskId, nil)
-
 	if err != nil {
-		return infra.Task{}, err
+		return &infra.Task{}, err
 	}
-	return infra.Task{
+
+	return &infra.Task{
 		ID:         issue.Key,
 		Name:       issue.Fields.Summary,
 		Link:       jc.baseUrl + "/browse/" + issue.Key,
