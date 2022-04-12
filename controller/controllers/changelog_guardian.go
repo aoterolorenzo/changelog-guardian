@@ -4,6 +4,7 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	services2 "gitlab.com/aoterocom/changelog-guardian/application/services"
 	"gitlab.com/aoterocom/changelog-guardian/config"
+	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
 	"gitlab.com/aoterocom/changelog-guardian/controller/selectors"
 	"gitlab.com/aoterocom/changelog-guardian/controller/services"
@@ -46,6 +47,8 @@ func NewChangelogGuardianController(releaseProvider infraInterfaces.Provider, ta
 }
 
 func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *models.Release, mainBranch string, defaultBranch string) (*[]models.Release, error) {
+	Log.Infoln(lastRelease)
+
 	var from1 *time.Time
 	if lastRelease != nil {
 		layout := "2006-01-02T15:04:05"
@@ -80,6 +83,10 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		// If not, just use all the releases
 	} else {
 		infraTruncatedReleases = *releases
+	}
+
+	if len(infraTruncatedReleases) > 0 {
+		infraTruncatedReleases = infraTruncatedReleases[:len(infraTruncatedReleases)-1]
 	}
 
 	settings.Log.Debugf("Found %d releases\n", len(infraTruncatedReleases))

@@ -185,6 +185,6 @@ func (gc *GitProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 }
 
 func (gc *GitProvider) ReleaseURL(from *string, to string) (*string, error) {
-	url := "\"\""
+	url := ""
 	return &url, nil
 }
