@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...develop)
 
+## [![1.3.0]![2022-04-12]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.2.0...1.3.0)
+
+### ![Added]
+
+- ✨ [!79](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/79) Implemented Jira tasks pipe ([@aoterocom](https://gitlab.com/aoterocom))
+
+### ![Changed]
+
+- ✒️ [!76](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/76) Improved logging joining the errors as attached fields ([@aoterocom](https://gitlab.com/aoterocom))
+
+### ![Fixed]
+
+- 🐛 [!82](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/82) Error parsing git remotes ssh links to grab Github namespace and repository ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!81](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/81) Fixed CHANGELOG.md ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!80](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/80) Unreleased section update problems when using main command ([@aoterocom](https://gitlab.com/aoterocom))
+- 🐛 [!77](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/77) Fixed Github task labels retrieving ([@aoterocom](https://gitlab.com/aoterocom))
+
 ## [![v1.2.0]![2021-12-04]](https://gitlab.com/aoterocom/changelog-guardian/-/releases/v1.2.0)
 
 ### ![Added]
@@ -90,6 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🏗 [!19](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/19) Rebrand middleware / filters into Pipes ([@aoterocom](https://gitlab.com/aoterocom))
 
 [Unreleased]: https://img.shields.io/badge/-Unreleased-blueviolet?&style=for-the-badge
+[1.3.0]: https://img.shields.io/badge/Release-1.3.0-blueviolet?&style=for-the-badge
+[2022-04-12]: https://img.shields.io/badge/-2022--04--12-white?&style=for-the-badge
 [v1.2.0]: https://img.shields.io/badge/Release-v1.2.0-blueviolet?&style=for-the-badge
 [2021-12-04]: https://img.shields.io/badge/-2021--12--04-white?&style=for-the-badge
 [v1.1.1]: https://img.shields.io/badge/Release-v1.1.1-blueviolet?&style=for-the-badge
