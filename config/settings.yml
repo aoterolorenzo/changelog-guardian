@@ -50,6 +50,20 @@ tasksPipesCfg:
     paths:
       excluded: [ ]
       included: [ '*all' ]
+  jira:
+    regex: "\\[(?P<key>[A-Z]{2,}[-]{1,}\\d+)]"
+    baseUrl: "https://jira.atlassian.net/"
+    labels:
+      Breaking Changes: breaking
+      Added: feature
+      Changed: perf
+      Refactor: refactor
+      Fixed: bugfix
+      Dependencies: dependencies
+      Deprecated: deprecation
+      Removed: removal
+      Documentation: docs
+      Security: security
 initialVersion: 0.1.0
 templatesCfg:
   stylish_markdown:
