@@ -74,6 +74,20 @@ tasksPipesCfg:
     paths:
       excluded: [ ]
       included: [ '*all' ]
+  jira:
+    regex: "\\[(?P<key>[A-Z]{2,}[-]{1,}\\d+)]"
+    baseUrl: "https://jira.atlassian.net/"
+    labels:
+      Breaking Changes: breaking
+      Added: feature
+      Changed: perf
+      Refactor: refactor
+      Fixed: bugfix
+      Dependencies: dependencies
+      Deprecated: deprecation
+      Removed: removal
+      Documentation: docs
+      Security: security
 initialVersion: 0.1.0 # Initial version for generating an initial release
 templatesCfg:
   stylish_markdown:
@@ -153,6 +167,14 @@ Pipe code: `semver`
 Automatic Gitlab Merge Request merge with a message of the kind `Resolve "Issue tittle"`. This pipe modifies the task title to match only `Issue title`
 
 For example: `Resolve "Add new provider"` -> `Add new provider`
+
+#### Jira tasks Pipe
+
+Detect Jira tickets in your tasks and grab all the info from a pre-configured Jira endpoint
+
+For example: `Working in jira task [JIRAKEY-01]` -> `Title of the Jira ticket`
+
+**The tasks categories, author, links... will be replaced with the info grabbed direclty from the Jira ticket**
 
 #### Natural Language tasks Pipe
 
