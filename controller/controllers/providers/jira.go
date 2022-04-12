@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	settings "gitlab.com/aoterocom/changelog-guardian/config"
+	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"gopkg.in/andygrunwald/go-jira.v1"
 	"os"
@@ -55,11 +56,25 @@ func (jc JiraController) GetTask(taskId string) (*infra.Task, error) {
 		Title:      issue.Key,
 		Author:     issue.Fields.Creator.DisplayName,
 		AuthorLink: jc.baseUrl + "/jira/people/" + issue.Fields.Creator.AccountID,
-		Category:   inferCategory(issue.Fields.Labels, issue.Fields.Type.ID),
+		Category:   jc.inferCategory(issue.Fields.Labels, issue.Fields.Type),
 	}, nil
 }
 
-func inferCategory(labels []string, taskType string) models.Category {
-	// TODO: implement category inference
+func (jc JiraController) inferCategory(labels []string, taskType jira.IssueType) models.Category {
+
+	// If ticket has specific labels
+	for _, val := range settings.Settings.TasksPipesCfg.Jira.Labels {
+		if helpers.SliceContainsString(labels, val) {
+			return models.Category(val)
+		}
+	}
+
+	// If ticket is type bug or any custom type with the bug icon
+	if taskType.ID == "10004" || taskType.IconURL ==
+		"https://aoterocom.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10303?size=medium" {
+		return models.FIXED
+	}
+
+	// Otherwise, it's just a task
 	return models.ADDED
 }
