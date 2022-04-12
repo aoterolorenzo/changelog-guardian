@@ -9,7 +9,7 @@ import (
 )
 
 func TestJiraTasksPipe_Filter(t *testing.T) {
-	mockJiraController := services.MockJiraService{}
+	mockJiraController := services.MockJiraController{}
 	type args struct {
 		task *infra.Task
 	}
@@ -36,7 +36,7 @@ func TestJiraTasksPipe_Filter(t *testing.T) {
 		},
 		{
 			name:    "Test Jira pipe with a non accepted task",
-			args:    args{task: &infra.Task{Title: "[TES-2] Done task"}},
+			args:    args{task: &infra.Task{Title: "[BCLOUD-15488] Done task"}},
 			want:    &infra.Task{Title: "TES2", Category: models.ADDED},
 			want1:   true,
 			wantErr: false,
