@@ -22,4 +22,5 @@ func init() {
 	releaseNotesCmd.Flags().StringP("version", "v", "", "Version")
 	releaseNotesCmd.Flags().StringP("output-file", "o", "", "Output file")
 	releaseNotesCmd.Flags().BoolP("echo", "e", false, "Echo Release Notes on screen")
+	releaseNotesCmd.Flags().BoolP("skip-update", "", false, "Skip CHANGELOG.md update before executing the command")
 }

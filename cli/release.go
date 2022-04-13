@@ -27,5 +27,6 @@ func init() {
 	releaseCmd.Flags().StringP("version", "v", "", "Force versioning")
 	releaseCmd.Flags().String("pre", "", "Pre-release string (semver)")
 	releaseCmd.Flags().String("build", "", "Build metadata (semver)")
+	releaseCmd.Flags().BoolP("skip-update", "", false, "Skip CHANGELOG.md update before executing the command")
 
 }
