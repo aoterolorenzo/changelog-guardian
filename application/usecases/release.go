@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
@@ -15,9 +16,6 @@ import (
 )
 
 func ReleaseCmd(cmd *cobra.Command, args []string) {
-	// Update current CHANGELOG to prepare for release, using the regular command
-	changelog := RegularCmd(cmd, args)
-
 	argTemplate := cmd.Flag("template").Value.String()
 	if argTemplate != "" {
 		Settings.Template = argTemplate
@@ -25,6 +23,20 @@ func ReleaseCmd(cmd *cobra.Command, args []string) {
 	changelogService, err := selectors.ChangelogTemplateSelector(Settings.Template)
 	if err != nil {
 		Log.WithError(err).Fatalf("Error selecting template\n")
+	}
+
+	var changelog *models.Changelog
+	argSkipUpdate, _ := strconv.ParseBool(cmd.Flag("skip-update").Value.String())
+	if !argSkipUpdate {
+		// Update current CHANGELOG to prepare for release, using the regular command
+		changelog = RegularCmd(cmd, args)
+	} else {
+		Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
+		changelog, err = (*changelogService).Parse(Settings.ChangelogPath)
+		if err != nil && err == errors.Errorf("open : no such file or directory") {
+			Log.WithError(err).Fatalf("Error retrieving changelog file\n")
+		}
+		return
 	}
 
 	// Load args:
