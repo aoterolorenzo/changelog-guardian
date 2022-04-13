@@ -25,5 +25,6 @@ func init() {
 	calculateReleaseCmd.Flags().BoolP("major", "M", false, "Major Release")
 	calculateReleaseCmd.Flags().String("pre", "", "Pre-release string (semver)")
 	calculateReleaseCmd.Flags().String("build", "", "Build metadata (semver)")
+	calculateReleaseCmd.Flags().BoolP("skip-update", "", false, "Skip CHANGELOG.md update before executing the command")
 
 }
