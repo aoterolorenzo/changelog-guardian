@@ -80,7 +80,7 @@ release:
     - git commit -m "[AUTOMATED] Prepare for next iteration $(cat VERSION)"
     - git push -o ci-skip https://gitlab-ci-token:${GITLAB_PUSH_TOKEN}@gitlab.com/aoterocom/changelog-guardian.git
     - go run main.go release-notes
-    - go install github.com/goreleaser/goreleaser@latest
+    - go install github.com/goreleaser/goreleaser@v1.6.2
     - GITLAB_TOKEN=$GITLAB_PUSH_TOKEN goreleaser release --skip-validate --rm-dist --release-notes RELEASE-NOTES.md
     - |
       curl --location --request POST "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/merge_requests" \
