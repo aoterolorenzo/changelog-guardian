@@ -28,10 +28,18 @@ func CalculateReleaseCmd(cmd *cobra.Command, args []string) {
 		Log.WithError(err).Fatalf("Error selecting template\n")
 	}
 
-	Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
-	changelog, err := (*changelogService).Parse(Settings.ChangelogPath)
-	if err != nil && err == errors.Errorf("open : no such file or directory") {
-		Log.WithError(err).Fatalf("Error retrieving changelog file\n")
+	var changelog *models.Changelog
+	argSkipUpdate, _ := strconv.ParseBool(cmd.Flag("skip-update").Value.String())
+	if !argSkipUpdate {
+		// Update current CHANGELOG to prepare for release, using the regular command
+		changelog = RegularCmd(cmd, args)
+	} else {
+		Log.Infof("Retrieving changelog from %s...\n", Settings.ChangelogPath)
+		changelog, err = (*changelogService).Parse(Settings.ChangelogPath)
+		if err != nil && err == errors.Errorf("open : no such file or directory") {
+			Log.WithError(err).Fatalf("Error retrieving changelog file\n")
+			return
+		}
 	}
 
 	// Load args:
