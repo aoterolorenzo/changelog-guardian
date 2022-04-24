@@ -1,13 +1,18 @@
 package providers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"github.com/xanzy/go-gitlab"
 	application "gitlab.com/aoterocom/changelog-guardian/application/models"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
+	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -39,9 +44,13 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 	}
 
 	gitlabClient, _ := gitlab.NewClient(gp.GitToken)
-	project, _, err := gitlabClient.Projects.GetProject(*namespacedRepo, &gitlab.GetProjectOptions{})
+	project, _, err := gitlabClient.Projects.GetProject(url.QueryEscape(*namespacedRepo), &gitlab.GetProjectOptions{})
 	if err != nil {
-		return nil, err
+		id, err := gp.getProjectIdWithDirectRequest(namespacedRepo)
+		project = &gitlab.Project{ID: id}
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var releases []*gitlab.Release
@@ -72,6 +81,36 @@ func (gp *GitlabProvider) GetReleases(from *time.Time, to *time.Time) (*[]infras
 	}
 	helpers.ReverseAny(gitReleases)
 	return &gitReleases, nil
+}
+
+func (gp *GitlabProvider) getProjectIdWithDirectRequest(namespacedRepo *string) (int, error) {
+
+	req, err := http.NewRequest("GET", "https://gitlab.com/api/v4/projects/"+url.QueryEscape(*namespacedRepo), nil)
+	if err != nil {
+		return 0, err
+	}
+
+	client := &http.Client{}
+	req.Header.Add("PRIVATE-TOKEN", gp.GitToken)
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, errors.New(fmt.Sprintf("response status code: %d", http.StatusOK))
+	}
+
+	var gitlabProject struct {
+		Id int `json:"id"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&gitlabProject)
+	if err != nil {
+		return 0, err
+	}
+
+	return gitlabProject.Id, nil
 }
 
 func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
