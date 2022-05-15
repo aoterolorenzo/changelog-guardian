@@ -3,6 +3,8 @@ package services
 import (
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
+	"sort"
+	"time"
 )
 
 type ChangelogMixer struct {
@@ -14,20 +16,32 @@ func NewChangelogMixer() *ChangelogMixer {
 
 func (cm *ChangelogMixer) MergeChangelogs(changelog1 models.Changelog, changelog2 models.Changelog) models.Changelog {
 
+	// If one is empty, return the other
+	if len(changelog1.Releases) == 0 {
+		return changelog2
+	} else if len(changelog2.Releases) == 0 {
+		return changelog1
+	}
 	// Generate an unreleased: If there is one in local changelog (which should), just save the merge between both
 	// If not, just save the changelog2 unreleased section
 	var unreleased models.Release
 	if cm.ChangelogContainsRelease(changelog1,
 		*models.NewRelease("Unreleased", "", "", false, nil)) {
-		unreleased = *cm.MergeReleases(changelog2.Releases[0], changelog1.Releases[0])
+
+		if cm.ChangelogContainsRelease(changelog2,
+			*models.NewRelease("Unreleased", "", "", false, nil)) {
+			unreleased = *cm.MergeReleases(changelog2.Releases[0], changelog1.Releases[0])
+			// Remove the unreleased section to start iterating to merge the releases
+			changelog2.Releases = changelog2.Releases[1:]
+		} else {
+			unreleased = changelog1.Releases[0]
+		}
+
 		changelog1.Releases = changelog1.Releases[1:]
 
 	} else {
 		unreleased = changelog2.Releases[0]
 	}
-
-	// Remove the unreleased section to start iterating to merge the releases
-	changelog2.Releases = changelog2.Releases[1:]
 
 	// Now, we just iterate on changelog2 releases, saving or merging each depending on if exist or not
 	for i, release := range changelog2.Releases {
@@ -44,7 +58,7 @@ func (cm *ChangelogMixer) MergeChangelogs(changelog1 models.Changelog, changelog
 	changelog1.Releases = append(changelog1.Releases, unreleased)
 	helpers.ReverseAny(changelog1.Releases)
 
-	return changelog1
+	return cm.orderChangelogReleasesByDate(changelog1)
 }
 
 func (cm *ChangelogMixer) MergeReleases(release1 models.Release, release2 models.Release) *models.Release {
@@ -55,6 +69,10 @@ func (cm *ChangelogMixer) MergeReleases(release1 models.Release, release2 models
 			// If task in both releases, we remove the one on release1, and we take the one in release2
 			_, _, release2containsTask := cm.ReleaseContainsTask(release2, task)
 			if !release2containsTask {
+				if release2.Sections == nil {
+					release2.Sections = make(map[models.Category][]models.Task)
+				}
+
 				helpers.ReverseAny(release2.Sections[category])
 				release2.Sections[category] = append(release2.Sections[category], task)
 				helpers.ReverseAny(release2.Sections[category])
@@ -104,4 +122,21 @@ func (cm *ChangelogMixer) ChangelogContainsTask(changelog models.Changelog, task
 		}
 	}
 	return nil, nil, false
+}
+
+func (cm *ChangelogMixer) orderChangelogReleasesByDate(changelog models.Changelog) models.Changelog {
+
+	sort.Slice(changelog.Releases, func(i, j int) bool {
+
+		if changelog.Releases[j].Version == "Unreleased" {
+			return false
+		}
+
+		layout := "02-01-2006"
+		date1, _ := time.Parse(layout, changelog.Releases[i].Date)
+		date2, _ := time.Parse(layout, changelog.Releases[j].Date)
+		return date1.Unix() > date2.Unix()
+	})
+
+	return changelog
 }
