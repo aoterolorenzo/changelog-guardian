@@ -1,9 +1,11 @@
 package services
 
 import (
+	"fmt"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -58,7 +60,8 @@ func (cm *ChangelogMixer) MergeChangelogs(changelog1 models.Changelog, changelog
 	changelog1.Releases = append(changelog1.Releases, unreleased)
 	helpers.ReverseAny(changelog1.Releases)
 
-	return cm.orderChangelogReleasesByDate(changelog1)
+	orderedChangelog := cm.orderChangelogReleasesByDate(changelog1)
+	return cm.parseRemovals(orderedChangelog)
 }
 
 func (cm *ChangelogMixer) MergeReleases(release1 models.Release, release2 models.Release) *models.Release {
@@ -97,6 +100,40 @@ func (cm *ChangelogMixer) ReleaseContainsTask(release models.Release, task model
 
 	}
 	return nil, nil, false
+}
+
+func (cm *ChangelogMixer) parseRemovals(changelog models.Changelog) models.Changelog {
+	for _, release := range changelog.Releases {
+		for _, task := range release.Sections[models.REMOVED] {
+
+			// Research for a non-REMOVED task with same ID or title IN SAME RELEASE
+			for catT, sectionT := range release.Sections {
+				if catT == models.REMOVED {
+					continue
+				}
+
+				for _, taskT := range sectionT {
+					fmt.Println(task.Title)
+					fmt.Println(taskT.Title)
+					if task.ID == taskT.ID || task.Title == taskT.Title ||
+						strings.ToLower(task.Title) == "revert \""+strings.ToLower(taskT.Title)+"\"" {
+						// REMOVE both
+						release.Sections[models.REMOVED] = removeTaskFromRelease(release.Sections[models.REMOVED], task)
+						if len(release.Sections[models.REMOVED]) == 0 {
+							delete(release.Sections, models.REMOVED)
+						}
+
+						release.Sections[catT] = removeTaskFromRelease(release.Sections[catT], taskT)
+						if len(release.Sections[catT]) == 0 {
+							delete(release.Sections, catT)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return changelog
 }
 
 func (cm *ChangelogMixer) ChangelogContainsRelease(changelog models.Changelog, rel models.Release) bool {
@@ -139,4 +176,13 @@ func (cm *ChangelogMixer) orderChangelogReleasesByDate(changelog models.Changelo
 	})
 
 	return changelog
+}
+
+func removeTaskFromRelease(s []models.Task, r models.Task) []models.Task {
+	for i, v := range s {
+		if v == r {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
 }

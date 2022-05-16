@@ -892,3 +892,158 @@ func TestChangelogMixer_MergeReleases(t *testing.T) {
 		})
 	}
 }
+
+func TestChangelogMixer_ParseRemovals(t *testing.T) {
+	type args struct {
+		changelog models.Changelog
+	}
+	tests := []struct {
+		name string
+		args args
+		want models.Changelog
+	}{
+		{
+			name: "removal test same ID",
+			args: args{changelog: models.Changelog{
+				Releases: []models.Release{
+					{
+						Date:    "01-09-2020",
+						Version: "1.0",
+						Sections: map[models.Category][]models.Task{
+							models.ADDED: {
+								models.Task{
+									ID:         "#55",
+									Name:       "Task 55",
+									Href:       "",
+									Title:      "Task 55",
+									Author:     "aoterocom",
+									AuthorHref: "/aoterocom",
+									Category:   "ADDED",
+								},
+							},
+							models.REMOVED: {
+								models.Task{
+									ID:         "#56",
+									Name:       "Task 55",
+									Href:       "",
+									Title:      "Revert \"Task 55\"",
+									Author:     "aoterocom",
+									AuthorHref: "/aoterocom",
+									Category:   "REMOVED",
+								},
+							},
+						},
+					},
+				},
+			},
+			},
+			want: models.Changelog{
+				Releases: []models.Release{
+					{
+						Date:     "01-09-2020",
+						Version:  "1.0",
+						Sections: map[models.Category][]models.Task{},
+					},
+				},
+			},
+		},
+		{
+			name: "removal test revert title",
+			args: args{changelog: models.Changelog{
+				Releases: []models.Release{
+					{
+						Date:    "01-09-2020",
+						Version: "1.0",
+						Sections: map[models.Category][]models.Task{
+							models.ADDED: {
+								models.Task{
+									ID:         "#55",
+									Name:       "Task 55",
+									Href:       "",
+									Title:      "Task 55",
+									Author:     "aoterocom",
+									AuthorHref: "/aoterocom",
+									Category:   "ADDED",
+								},
+							},
+							models.REMOVED: {
+								models.Task{
+									ID:         "#55",
+									Name:       "Task 55",
+									Href:       "",
+									Title:      "Other",
+									Author:     "aoterocom",
+									AuthorHref: "/aoterocom",
+									Category:   "REMOVED",
+								},
+							},
+						},
+					},
+				},
+			},
+			},
+			want: models.Changelog{
+				Releases: []models.Release{
+					{
+						Date:     "01-09-2020",
+						Version:  "1.0",
+						Sections: map[models.Category][]models.Task{},
+					},
+				},
+			},
+		},
+		{
+			name: "removal test same title",
+			args: args{changelog: models.Changelog{
+				Releases: []models.Release{
+					{
+						Date:    "01-09-2020",
+						Version: "1.0",
+						Sections: map[models.Category][]models.Task{
+							models.ADDED: {
+								models.Task{
+									ID:         "#56",
+									Name:       "Task 55",
+									Href:       "",
+									Title:      "Task 55",
+									Author:     "aoterocom",
+									AuthorHref: "/aoterocom",
+									Category:   "ADDED",
+								},
+							},
+							models.REMOVED: {
+								models.Task{
+									ID:         "#XX",
+									Name:       "X",
+									Href:       "",
+									Title:      "Task 55",
+									Author:     "aoterocom",
+									AuthorHref: "/aoterocom",
+									Category:   "REMOVED",
+								},
+							},
+						},
+					},
+				},
+			},
+			},
+			want: models.Changelog{
+				Releases: []models.Release{
+					{
+						Date:     "01-09-2020",
+						Version:  "1.0",
+						Sections: map[models.Category][]models.Task{},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cm := &ChangelogMixer{}
+			if got := cm.parseRemovals(tt.args.changelog); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseRemovals() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
