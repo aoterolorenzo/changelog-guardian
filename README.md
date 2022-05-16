@@ -110,6 +110,8 @@ Changelog Guardian implements different providers for both releases and tasks. T
 
 ¿Do you want to retrieve the releases from the repository git tags, the Gitlab releases, or maybe from an Artifactory or Registry (pending implementation)?  ¿Do you want to retrieve your tasks from git commits, from Gitlab's Merge Requests, from Github Pull request (pending)...? It's up to you.
 
+Also, Changelog Guardian provides some methods to revert a task already in the CHANGELOG _(see each task provider description above)_
+
 #### Git release provider
 
 Obtains the releases and the project versioning from the git repository tags.
@@ -117,6 +119,8 @@ Obtains the releases and the project versioning from the git repository tags.
 #### Git tasks provider
 
 Each commit is a task. This seems for ninjas, but can be very optimized with task Pipes
+
+_Revert: Git commit message `Revert "Commit message from commit to revert"`_
 
 #### Gitlab release provider
 
@@ -129,6 +133,8 @@ Releases are obtained from the [Gitlab Releases](https://about.gitlab.com/releas
 
 Fetches already merged Merge Requests as tasks. Remember that you can customize your configuration to modify the labels you will use.
 
+_Revert: Using the REMOVE label or making a Merge Request with the title `Revert "Title from Merge Request to revert"`_
+
 #### GitHub release provider
 
 Releases are obtained from the [Github Releases](https://docs.github.com/es/repositories/releasing-projects-on-github/about-releases) from your project.
@@ -139,6 +145,8 @@ Releases are obtained from the [Github Releases](https://docs.github.com/es/repo
 #### GitHub tasks provider
 
 As the GitHub tasks provider, it fetches already merged Merge Requests as tasks. Remember that you can customize your configuration to modify the labels you will use.
+
+_Revert: Using the REMOVE label or making a Pull Request with the title `Revert "Title from Pull Request to revert"`_
 
 ### Pipes
 
@@ -175,6 +183,8 @@ Detect Jira tickets in your tasks and grab all the info from a pre-configured Ji
 For example: `Working in jira task [JIRAKEY-01]` -> `Title of the Jira ticket`
 
 **The tasks categories, author, links... will be replaced with the info grabbed direclty from the Jira ticket**
+
+_Revert: when the pipe incoming task is marked as a REMOVAL (revert), the Jira tasks Pipe will keep that category with the parsed Jira task_
 
 #### Natural Language tasks Pipe
 

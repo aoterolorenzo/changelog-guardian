@@ -133,6 +133,9 @@ func (gc *GitProvider) GetTasks(from *time.Time, to *time.Time, targetBranch str
 }
 
 func (gc *GitProvider) DefineCategory(task infrastructure.Task) application.Category {
+	if strings.HasPrefix(strings.ToLower(task.Title), "revert") {
+		return application.REMOVED
+	}
 	return application.ADDED
 }
 

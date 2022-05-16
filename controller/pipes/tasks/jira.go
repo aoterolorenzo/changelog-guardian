@@ -1,6 +1,7 @@
 package pipes
 
 import (
+	application "gitlab.com/aoterocom/changelog-guardian/application/models"
 	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers/providers"
 	"gitlab.com/aoterocom/changelog-guardian/controller/interfaces"
@@ -34,6 +35,11 @@ func (tf *JiraTasksPipe) Filter(task *infra.Task) (*infra.Task, bool, error) {
 		grabbedTask, err := tf.providerController.GetTask(paramsMap["key"])
 		if err != nil {
 			return nil, true, err
+		}
+
+		// Override Jira category if removal has been detected on provider
+		if task.Category == application.REMOVED {
+			grabbedTask.Category = application.REMOVED
 		}
 		return grabbedTask, true, nil
 	}
