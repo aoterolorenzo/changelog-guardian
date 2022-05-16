@@ -173,6 +173,11 @@ func (gp *GitlabProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 
 func (gp *GitlabProvider) DefineCategory(task infrastructure.Task) application.Category {
 	var category = application.ADDED
+
+	if strings.HasPrefix(strings.ToLower(task.Title), "revert") {
+		return application.REMOVED
+	}
+
 	for _, label := range task.Labels {
 		switch label {
 		case Settings.Providers.Gitlab.Labels[application.ADDED]:
