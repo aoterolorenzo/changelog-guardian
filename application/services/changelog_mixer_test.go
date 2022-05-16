@@ -734,3 +734,161 @@ func TestChangelogMixer_ChangelogContainsTask(t *testing.T) {
 		})
 	}
 }
+
+func TestChangelogMixer_MergeReleases(t *testing.T) {
+	type args struct {
+		release1 models.Release
+		release2 models.Release
+	}
+	tests := []struct {
+		name string
+		args args
+		want *models.Release
+	}{
+		{
+			name: "normal merge",
+			args: args{
+				release1: models.Release{
+					Date:    "01-09-2020",
+					Version: "1.0",
+					Sections: map[models.Category][]models.Task{
+						models.ADDED: {
+							models.Task{
+								ID:         "#55",
+								Name:       "Task 55",
+								Href:       "",
+								Title:      "Task 55",
+								Author:     "aoterocom",
+								AuthorHref: "/aoterocom",
+								Category:   "ADDED",
+							},
+						},
+
+						models.FIXED: {
+							models.Task{
+								ID:         "#6",
+								Name:       "Task 6",
+								Href:       "",
+								Title:      "Task 6",
+								Author:     "aoterocom",
+								AuthorHref: "/aoterocom",
+								Category:   "FIXED",
+							},
+							models.Task{
+								ID:         "#7",
+								Name:       "Task 7",
+								Href:       "",
+								Title:      "Task 7",
+								Author:     "aoterocom",
+								AuthorHref: "/aoterocom",
+								Category:   "FIXED",
+							},
+						},
+					},
+				},
+				release2: models.Release{
+					Date:    "01-09-2020",
+					Version: "1.0",
+					Sections: map[models.Category][]models.Task{
+						models.ADDED: {
+							models.Task{
+								ID:         "#5",
+								Name:       "Task 5",
+								Href:       "",
+								Title:      "Task 5",
+								Author:     "aoterocom",
+								AuthorHref: "/aoterocom",
+								Category:   "ADDED",
+							},
+						},
+
+						models.FIXED: {
+							models.Task{
+								ID:         "#6",
+								Name:       "Task 6",
+								Href:       "",
+								Title:      "Task 6",
+								Author:     "aoterocom",
+								AuthorHref: "/aoterocom",
+								Category:   "FIXED",
+							},
+							models.Task{
+								ID:         "#8",
+								Name:       "Task 8",
+								Href:       "",
+								Title:      "Task 8",
+								Author:     "aoterocom",
+								AuthorHref: "/aoterocom",
+								Category:   "FIXED",
+							},
+						},
+					},
+				},
+			},
+			want: &models.Release{
+				Date:    "01-09-2020",
+				Version: "1.0",
+				Sections: map[models.Category][]models.Task{
+					models.ADDED: {
+						models.Task{
+							ID:         "#55",
+							Name:       "Task 55",
+							Href:       "",
+							Title:      "Task 55",
+							Author:     "aoterocom",
+							AuthorHref: "/aoterocom",
+							Category:   "ADDED",
+						},
+						models.Task{
+							ID:         "#5",
+							Name:       "Task 5",
+							Href:       "",
+							Title:      "Task 5",
+							Author:     "aoterocom",
+							AuthorHref: "/aoterocom",
+							Category:   "ADDED",
+						},
+					},
+
+					models.FIXED: {
+						models.Task{
+							ID:         "#7",
+							Name:       "Task 7",
+							Href:       "",
+							Title:      "Task 7",
+							Author:     "aoterocom",
+							AuthorHref: "/aoterocom",
+							Category:   "FIXED",
+						},
+						models.Task{
+							ID:         "#6",
+							Name:       "Task 6",
+							Href:       "",
+							Title:      "Task 6",
+							Author:     "aoterocom",
+							AuthorHref: "/aoterocom",
+							Category:   "FIXED",
+						},
+						models.Task{
+							ID:         "#8",
+							Name:       "Task 8",
+							Href:       "",
+							Title:      "Task 8",
+							Author:     "aoterocom",
+							AuthorHref: "/aoterocom",
+							Category:   "FIXED",
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cm := &ChangelogMixer{}
+			if got := cm.MergeReleases(tt.args.release1, tt.args.release2); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MergeReleases() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
