@@ -31,7 +31,7 @@ func (svs *SemVerService) CalculateNextVersion(categories []models.Category, ver
 		categoriesMap[category] = true
 	}
 
-	if categoriesMap[models.BREAKING_CHANGE] {
+	if categoriesMap[models.BREAKING_CHANGE] || categoriesMap[models.REMOVED] {
 		return svs.BumpMajor(versionToBump)
 	}
 
