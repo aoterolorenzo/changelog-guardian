@@ -1,6 +1,10 @@
 package controllers
 
 import (
+	"strconv"
+	"strings"
+	"time"
+
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	services2 "gitlab.com/aoterocom/changelog-guardian/application/services"
 	"gitlab.com/aoterocom/changelog-guardian/config"
@@ -10,9 +14,6 @@ import (
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infraInterfaces "gitlab.com/aoterocom/changelog-guardian/infrastructure/interfaces"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type ChangelogGuardianController struct {
@@ -186,6 +187,9 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 	// Pass tasks through Task Pipes
 	*unreleasedTasks = cgc.throughTasksPipes(*unreleasedTasks)
 
+	if releaseUrl == "" {
+		releaseUrl = "."
+	}
 	unreleasedRelease := models.NewRelease("Unreleased", "",
 		releaseUrl, false, nil)
 	for _, task := range *unreleasedTasks {
