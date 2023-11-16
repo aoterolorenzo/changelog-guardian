@@ -2,13 +2,15 @@ package providers
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/pkg/errors"
+	"gopkg.in/andygrunwald/go-jira.v1"
+
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
-	"gopkg.in/andygrunwald/go-jira.v1"
-	"os"
 )
 
 type JiraController struct {
@@ -55,8 +57,7 @@ func (jc JiraController) GetTask(taskId string) (*infra.Task, error) {
 	if author == nil {
 		author = issue.Fields.Creator
 	}
-	authorName = author.DisplayName
-	authorLink = jc.baseUrl + "/jira/people/" + author.AccountID
+	authorLink = jc.baseUrl + "secure/ViewProfile.jspa?name=" + author.Name
 
 	return &infra.Task{
 		ID:         issue.Key,
