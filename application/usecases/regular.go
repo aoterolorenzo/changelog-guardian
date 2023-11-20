@@ -9,6 +9,7 @@ import (
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/controller/controllers"
 	infraSelectors "gitlab.com/aoterocom/changelog-guardian/infrastructure/selectors"
+	"strconv"
 )
 
 func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
@@ -79,6 +80,23 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 			retrievedUnreleased := retrievedChangelog.Releases[0]
 			localChangelogExceptUnreleased := localChangelog.Releases[:len(localChangelog.Releases)-1]
 			for sec, sectionTasks := range retrievedUnreleased.Sections {
+				// Create a map to store unique IDs
+				uniqueIDs := make(map[string]bool)
+				// Create a slice to store non-duplicate tasks
+				nonDuplicates := make([]models.Task, 0)
+				// If --no-dup set, we just remove duplicates
+				argNoDup, _ := strconv.ParseBool(cmd.Flag("no-dups").Value.String())
+				if argNoDup {
+					for _, task := range sectionTasks {
+						if _, exists := uniqueIDs[task.ID]; !exists {
+							nonDuplicates = append(nonDuplicates, task)
+							uniqueIDs[task.ID] = true
+						}
+					}
+				}
+
+				retrievedUnreleased.Sections[sec] = nonDuplicates
+
 				for i, task := range sectionTasks {
 					provChangelog := *models.NewChangelog()
 					provChangelog.Releases = localChangelogExceptUnreleased

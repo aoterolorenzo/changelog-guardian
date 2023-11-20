@@ -34,6 +34,7 @@ func init() {
 	RegularCmd.PersistentFlags().String("output-template", "", "Output CHANGELOG template")
 	RegularCmd.PersistentFlags().String("changelog-path", "", "CHANGELOG path")
 	RegularCmd.PersistentFlags().String("config", "", "Config file path")
+	RegularCmd.PersistentFlags().Bool("no-dups", false, "Disable duplicates from parsing")
 	RegularCmd.PersistentFlags().Bool("silent", false, "Logging level")
 }
 
