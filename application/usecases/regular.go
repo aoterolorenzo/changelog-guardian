@@ -79,24 +79,25 @@ func RegularCmd(cmd *cobra.Command, args []string) *models.Changelog {
 		if localChangelog != nil && len(localChangelog.Releases) > 0 {
 			retrievedUnreleased := retrievedChangelog.Releases[0]
 			localChangelogExceptUnreleased := localChangelog.Releases[:len(localChangelog.Releases)-1]
-			for sec, sectionTasks := range retrievedUnreleased.Sections {
-				// Create a map to store unique IDs
-				uniqueIDs := make(map[string]bool)
-				// Create a slice to store non-duplicate tasks
-				nonDuplicates := make([]models.Task, 0)
+			for sec, sectionTasks := range localChangelog.Releases[0].Sections {
 				// If --no-dup set, we just remove duplicates
 				argNoDup, _ := strconv.ParseBool(cmd.Flag("no-dups").Value.String())
 				if argNoDup {
+					// Create a map to store unique IDs
+					uniqueIDs := make(map[string]bool)
+					// Create a slice to store non-duplicate tasks
+					nonDuplicates := make([]models.Task, 0)
 					for _, task := range sectionTasks {
 						if _, exists := uniqueIDs[task.ID]; !exists {
 							nonDuplicates = append(nonDuplicates, task)
 							uniqueIDs[task.ID] = true
 						}
 					}
+					localChangelog.Releases[0].Sections[sec] = nonDuplicates
 				}
+			}
 
-				retrievedUnreleased.Sections[sec] = nonDuplicates
-
+			for sec, sectionTasks := range retrievedUnreleased.Sections {
 				for i, task := range sectionTasks {
 					provChangelog := *models.NewChangelog()
 					provChangelog.Releases = localChangelogExceptUnreleased
