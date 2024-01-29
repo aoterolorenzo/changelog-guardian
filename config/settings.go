@@ -22,12 +22,23 @@ type GlobalSettings struct {
 	DevelopBranch    string `yaml:"defaultBranch"`
 	CGConfigPath     string `yaml:"cgConfigPath"`
 	Providers        struct {
+		Git struct {
+			GitRoot string `yaml:"gitRoot"`
+		} `yaml:"git"`
 		Gitlab struct {
-			Labels map[models.Category]string `yaml:"labels"`
+			Labels  map[models.Category]string `yaml:"labels"`
+			GitRoot string                     `yaml:"gitRoot"`
 		} `yaml:"gitlab"`
 		Github struct {
-			Labels map[models.Category]string `yaml:"labels"`
+			Labels  map[models.Category]string `yaml:"labels"`
+			GitRoot string                     `yaml:"gitRoot"`
 		} `yaml:"github"`
+		GithubPRs struct {
+			VersionRegex    string `yaml:"versionRegex"`
+			GHReleaseSearch string `yaml:"ghReleaseSearch"`
+			TargetBranch    string `yaml:"targetBranch"`
+			GitRoot         string `yaml:"gitRoot"`
+		} `yaml:"githubPRs"`
 	} `yaml:"providers"`
 	ReleaseProvider string   `yaml:"releaseProvider"`
 	TasksProvider   string   `yaml:"tasksProvider"`

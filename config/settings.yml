@@ -5,7 +5,10 @@ defaultBranch: develop
 cgConfigPath: .cg-config.yml
 template: markdown
 providers:
+  git:
+    gitRoot: ./
   gitlab:
+    gitRoot: ./
     labels:
       Breaking Changes: kind::breaking
       Added: kind::feature
@@ -18,6 +21,7 @@ providers:
       Documentation: kind::docs
       Security: kind::security
   github:
+    gitRoot: ./
     labels:
       Breaking Changes: breaking
       Added: feature
@@ -29,6 +33,11 @@ providers:
       Removed: removal
       Documentation: docs
       Security: security
+  github_prs:
+    ghReleaseSearch: release
+    versionRegex: v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
+    targetBranch: main
+    gitRoot: ./
 releaseProvider: git
 tasksProvider: git
 releasePipes: [ 'semver' ]
