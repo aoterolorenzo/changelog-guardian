@@ -17,6 +17,9 @@ func ProviderSelector(providerStr string) (*interfaces.Provider, error) {
 	case "github":
 		prov := interfaces.Provider(providers.NewGithubProvider(nil))
 		return &prov, nil
+	case "githubPrs":
+		prov := interfaces.Provider(providers.NewGithubPRProvider(nil))
+		return &prov, nil
 	default:
 		return nil, errors.Errorf("unknown provider " + providerStr)
 	}

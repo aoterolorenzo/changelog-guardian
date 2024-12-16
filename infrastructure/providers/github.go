@@ -116,7 +116,7 @@ func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		TextMatch: false,
 		ListOptions: github.ListOptions{
 			Page:    0,
-			PerPage: 0,
+			PerPage: 100,
 		},
 	}
 

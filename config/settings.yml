@@ -33,13 +33,14 @@ providers:
       Removed: removal
       Documentation: docs
       Security: security
-  github_prs:
+  githubPRs:
     ghReleaseSearch: release
     versionRegex: v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
     targetBranch: main
     gitRoot: ./
 releaseProvider: git
 tasksProvider: git
+categoryFromPipes: false
 releasePipes: [ 'semver' ]
 tasksPipes: [ 'conventional_commits' ]
 tasksPipesCfg:
@@ -55,6 +56,9 @@ tasksPipesCfg:
   inclusions_exclusions:
     labels:
       excluded: [ 'internal' ]
+      included: [ '*all' ]
+    regexps:
+      excluded: [ ]
       included: [ '*all' ]
     paths:
       excluded: [ ]

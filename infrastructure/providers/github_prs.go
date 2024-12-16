@@ -2,11 +2,9 @@ package providers
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v41/github"
 	"github.com/joho/godotenv"
-	"github.com/pkg/errors"
 	application "gitlab.com/aoterocom/changelog-guardian/application/models"
 	. "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
@@ -15,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -29,15 +28,14 @@ func init() {
 	_ = godotenv.Load(cwd + "/vars.env")
 }
 
-func NewGithubPRProvider(repo *string) *GithubProvider {
-	return &GithubProvider{
+func NewGithubPRProvider(repo *string) *GithubPRProvider {
+	return &GithubPRProvider{
 		GitToken: os.Getenv("GITHUB_TOKEN"),
 		repo:     repo,
 	}
 }
 
 func (gp *GithubPRProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastructure.Release, error) {
-
 	namespacedRepo, err := gp.namespacedRepo()
 	if err != nil {
 		return nil, err
@@ -104,10 +102,8 @@ func (gp *GithubPRProvider) GetReleases(from *time.Time, to *time.Time) (*[]infr
 		var compRegEx = regexp.MustCompile(Settings.Providers.GithubPRs.VersionRegex)
 		match := compRegEx.FindStringSubmatch(*pullRequest.Title)
 		if len(match) == 0 {
-			return nil, errors.New("version not matching")
+			continue
 		}
-
-		fmt.Println(match)
 
 		pullRequestId := *pullRequest.ID
 		listOpts := &github.ListOptions{}
@@ -138,7 +134,7 @@ func (gp *GithubPRProvider) GetReleases(from *time.Time, to *time.Time) (*[]infr
 		}
 
 		releaseLink := *pullRequest.HTMLURL
-		gitReleases = append(gitReleases, *infrastructure.NewRelease(*pullRequest.Title, infrastructure.Hash(rune(*pullRequest.Number)), *pullRequest.CreatedAt, releaseLink))
+		gitReleases = append(gitReleases, *infrastructure.NewRelease(match[0], infrastructure.Hash(rune(*pullRequest.Number)), *pullRequest.CreatedAt, releaseLink))
 	}
 
 	helpers.ReverseAny(gitReleases)
@@ -146,7 +142,62 @@ func (gp *GithubPRProvider) GetReleases(from *time.Time, to *time.Time) (*[]infr
 }
 
 func (gp *GithubPRProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
+	Settings.Providers.Github.GitRoot = Settings.Providers.GithubPRs.GitRoot
 	return NewGithubProvider(gp.repo).GetTasks(from, to, targetBranch)
+}
+
+func (gp *GithubPRProvider) GetTask(taskId string) (*infrastructure.Task, error) {
+
+	namespacedRepo, err := gp.namespacedRepo()
+	if err != nil {
+		return nil, err
+	}
+
+	// Prepare client auth
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: gp.GitToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	githubClient := github.NewClient(tc)
+
+	taskIdInt, _ := strconv.Atoi(taskId)
+	pullRequest, _, err := githubClient.Issues.Get(ctx, gp.getOrg(*namespacedRepo), gp.getRepo(*namespacedRepo), taskIdInt)
+	if err != nil {
+		return nil, err
+	}
+
+	pullRequestId := *pullRequest.ID
+	listOpts := &github.ListOptions{}
+	var prFiles []*github.CommitFile
+	for {
+		files, resp, _ := githubClient.PullRequests.ListFiles(ctx, gp.getOrg(*namespacedRepo), gp.getRepo(*namespacedRepo), int(pullRequestId), listOpts)
+		prFiles = append(prFiles, files...)
+		// Exit the loop when we've seen all pages.
+		if resp.NextPage == 0 {
+			break
+		}
+
+		// Update the page number to get the next page.
+		listOpts.Page = resp.NextPage
+	}
+
+	var labelStrings []string
+	labels := pullRequest.Labels
+	for _, label := range labels {
+		labelStrings = append(labelStrings, label.String())
+	}
+
+	var fileChanges []string
+	for _, file := range prFiles {
+		fileChanges = append(fileChanges, file.GetFilename())
+	}
+
+	gitTask := infrastructure.NewTask("#"+strconv.Itoa(int(*pullRequest.Number)), "#"+strconv.Itoa(int(*pullRequest.Number)), *pullRequest.Title, *pullRequest.HTMLURL, *pullRequest.User.Login,
+		*pullRequest.User.HTMLURL, labelStrings, fileChanges)
+	gitTask.Category = gp.DefineCategory(*gitTask)
+
+	return gitTask, nil
 }
 
 func (gp *GithubPRProvider) DefineCategory(task infrastructure.Task) application.Category {
@@ -194,6 +245,11 @@ func (gp *GithubPRProvider) DefineCategory(task infrastructure.Task) application
 	}
 
 	return category
+}
+
+func (gp *GithubPRProvider) ReleaseURL(from *string, to string) (*string, error) {
+	url := ""
+	return &url, nil
 }
 
 func (gp *GithubPRProvider) repoURL() (*string, error) {
