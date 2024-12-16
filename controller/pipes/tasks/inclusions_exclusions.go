@@ -1,6 +1,7 @@
 package pipes
 
 import (
+	"fmt"
 	settings "gitlab.com/aoterocom/changelog-guardian/config"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	infra "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
@@ -67,10 +68,32 @@ func (tf *InclusionsExclusionsTasksPipe) Filter(task *infra.Task) (*infra.Task, 
 
 	}
 
+	var addressedRegexpsInclusions = false
+	var addressedRegexpsExclusions = true
+
+	if helpers.SliceContainsString(settings.Settings.TasksPipesCfg.InclusionsExclusions.Regexps.Inclusions, "*all") {
+		addressedRegexpsInclusions = true
+	}
+
+	if !helpers.SliceContainsString(settings.Settings.TasksPipesCfg.InclusionsExclusions.Regexps.Inclusions, "*all") &&
+		helpers.StringMatchesRegexSlice(settings.Settings.TasksPipesCfg.InclusionsExclusions.Regexps.Inclusions, task.Name) {
+		addressedRegexpsInclusions = true
+	}
+
+	if helpers.StringMatchesRegexSlice(settings.Settings.TasksPipesCfg.InclusionsExclusions.Labels.Exclusions, task.Name) {
+		addressedRegexpsExclusions = false
+	}
+
 	if !addressedLabelInclusions {
 		settings.Log.Debug("Task skipped: task label not between inclusion labels")
 	} else if !addressedLabelExclusions {
 		settings.Log.Debug("Task skipped: task label in exclusion labels")
+	}
+
+	if !addressedRegexpsInclusions {
+		settings.Log.Debug(fmt.Sprintf("Task skipped: task name %s not between inclusion regexps", task.Title))
+	} else if !addressedRegexpsExclusions {
+		settings.Log.Debug(fmt.Sprintf("Task skipped: task name %s in exclusion regexps", task.Title))
 	}
 
 	if !addressedPathInclusions {
@@ -79,7 +102,9 @@ func (tf *InclusionsExclusionsTasksPipe) Filter(task *infra.Task) (*infra.Task, 
 		settings.Log.Debug("Task skipped: task file path in exclusion paths")
 	}
 
-	if addressedLabelInclusions && addressedLabelExclusions && addressedPathInclusions && addressedPathExclusions {
+	if addressedLabelInclusions && addressedLabelExclusions &&
+		addressedPathInclusions && addressedPathExclusions &&
+		addressedRegexpsInclusions && addressedRegexpsExclusions {
 		return task, false, nil
 	}
 	return nil, true, nil

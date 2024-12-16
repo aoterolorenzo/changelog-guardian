@@ -3,6 +3,7 @@ package providers
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/pkg/errors"
 	"gopkg.in/andygrunwald/go-jira.v1"
@@ -73,15 +74,14 @@ func (jc JiraController) GetTask(taskId string) (*infra.Task, error) {
 func (jc JiraController) inferCategory(labels []string, taskType jira.IssueType) models.Category {
 
 	// If ticket has specific labels
-	for _, val := range settings.Settings.TasksPipesCfg.Jira.Labels {
+	for key, val := range settings.Settings.TasksPipesCfg.Jira.Labels {
 		if helpers.SliceContainsString(labels, val) {
-			return models.Category(val)
+			return key
 		}
 	}
 
 	// If ticket is type bug or any custom type with the bug icon
-	if taskType.ID == "10004" || taskType.IconURL ==
-		"https://aoterocom.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10303?size=medium" {
+	if taskType.Name == "Bug" || strings.Contains(taskType.IconURL, "10303") {
 		return models.FIXED
 	}
 
