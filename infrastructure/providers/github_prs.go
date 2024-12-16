@@ -12,12 +12,13 @@ import (
 	"golang.org/x/oauth2"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
-type GithubProvider struct {
+type GithubPRProvider struct {
 	GitToken string
 	repo     *string
 }
@@ -27,63 +28,14 @@ func init() {
 	_ = godotenv.Load(cwd + "/vars.env")
 }
 
-func NewGithubProvider(repo *string) *GithubProvider {
-	return &GithubProvider{
+func NewGithubPRProvider(repo *string) *GithubPRProvider {
+	return &GithubPRProvider{
 		GitToken: os.Getenv("GITHUB_TOKEN"),
 		repo:     repo,
 	}
 }
 
-func (gp *GithubProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastructure.Release, error) {
-	namespacedRepo, err := gp.namespacedRepo()
-	if err != nil {
-		return nil, err
-	}
-
-	// Prepare client auth
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: gp.GitToken},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-	githubClient := github.NewClient(tc)
-
-	var releases []*github.RepositoryRelease
-	opts := &github.ListOptions{
-		Page:    0,
-		PerPage: 0,
-	}
-
-	for {
-		// Get the first page with projects.
-		releasesRetrieved, resp, err := githubClient.Repositories.ListReleases(ctx, gp.getOrg(*namespacedRepo), gp.getRepo(*namespacedRepo), opts)
-		if err != nil {
-			return nil, err
-		}
-
-		releases = append(releases, releasesRetrieved...)
-
-		// Exit the loop when we've seen all pages.
-		if resp.NextPage == 0 {
-			break
-		}
-
-		// Update the page number to get the next page.
-		opts.Page = resp.NextPage
-	}
-
-	var gitReleases []infrastructure.Release
-	for _, release := range releases {
-		releaseLink := "https://github.com/" + *namespacedRepo + "/releases/tags/" + *release.Name
-		gitReleases = append(gitReleases, *infrastructure.NewRelease(*release.Name, infrastructure.Hash(release.GetTargetCommitish()), release.CreatedAt.Time, releaseLink))
-	}
-	helpers.ReverseAny(gitReleases)
-
-	return &gitReleases, nil
-}
-
-func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
-
+func (gp *GithubPRProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastructure.Release, error) {
 	namespacedRepo, err := gp.namespacedRepo()
 	if err != nil {
 		return nil, err
@@ -109,18 +61,19 @@ func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		timeQueryStr = " created:" + from.Format(layout) + ".." + to.Format(layout)
 	}
 
-	query := "type:pr is:merged repo:" + *namespacedRepo + " base:" + targetBranch + timeQueryStr
+	query := "type:pr is:merged repo:" + *namespacedRepo + " base:" + Settings.Providers.GithubPRs.TargetBranch +
+		timeQueryStr + " " + Settings.Providers.GithubPRs.GHReleaseSearch
 	opts := &github.SearchOptions{
 		Sort:      "",
 		Order:     "",
 		TextMatch: false,
 		ListOptions: github.ListOptions{
 			Page:    0,
-			PerPage: 100,
+			PerPage: 0,
 		},
 	}
 
-	var gitTasks []infrastructure.Task
+	var gitReleases []infrastructure.Release
 	var pullRequests []*github.Issue
 
 	for {
@@ -145,6 +98,12 @@ func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 	}
 
 	for _, pullRequest := range pullRequests {
+
+		var compRegEx = regexp.MustCompile(Settings.Providers.GithubPRs.VersionRegex)
+		match := compRegEx.FindStringSubmatch(*pullRequest.Title)
+		if len(match) == 0 {
+			continue
+		}
 
 		pullRequestId := *pullRequest.ID
 		listOpts := &github.ListOptions{}
@@ -173,79 +132,21 @@ func (gp *GithubProvider) GetTasks(from *time.Time, to *time.Time, targetBranch 
 		for _, file := range prFiles {
 			fileChanges = append(fileChanges, file.GetFilename())
 		}
-		gitTask := infrastructure.NewTask("#"+strconv.Itoa(int(*pullRequest.Number)), "#"+strconv.Itoa(int(*pullRequest.Number)), *pullRequest.Title, *pullRequest.HTMLURL, *pullRequest.User.Login,
-			*pullRequest.User.HTMLURL, labelStrings, fileChanges)
-		gitTask.Category = gp.DefineCategory(*gitTask)
-		gitTasks = append(gitTasks, *gitTask)
 
+		releaseLink := *pullRequest.HTMLURL
+		gitReleases = append(gitReleases, *infrastructure.NewRelease(match[0], infrastructure.Hash(rune(*pullRequest.Number)), *pullRequest.CreatedAt, releaseLink))
 	}
 
-	return &gitTasks, nil
+	helpers.ReverseAny(gitReleases)
+	return &gitReleases, nil
 }
 
-func (gp *GithubProvider) DefineCategory(task infrastructure.Task) application.Category {
-	var category = application.ADDED
-
-	if strings.HasPrefix(strings.ToLower(task.Title), "revert") {
-		return application.REMOVED
-	}
-
-	for _, label := range task.Labels {
-		switch label {
-		case Settings.Providers.Github.Labels[application.ADDED]:
-			category = application.ADDED
-			break
-		case Settings.Providers.Github.Labels[application.FIXED]:
-			category = application.FIXED
-			break
-		case Settings.Providers.Github.Labels[application.REFACTOR]:
-			category = application.REFACTOR
-			break
-		case Settings.Providers.Github.Labels[application.DEPRECATED]:
-			category = application.DEPRECATED
-			break
-		case Settings.Providers.Github.Labels[application.CHANGED]:
-			category = application.CHANGED
-			break
-		case Settings.Providers.Github.Labels[application.DEPENDENCIES]:
-			category = application.DEPENDENCIES
-			break
-		case Settings.Providers.Github.Labels[application.DOCUMENTATION]:
-			category = application.DOCUMENTATION
-			break
-		case Settings.Providers.Github.Labels[application.REMOVED]:
-			category = application.REMOVED
-			break
-		case Settings.Providers.Github.Labels[application.SECURITY]:
-			category = application.SECURITY
-			break
-		case Settings.Providers.Github.Labels[application.BREAKING_CHANGE]:
-			category = application.BREAKING_CHANGE
-			return category
-		default:
-			break
-		}
-	}
-
-	return category
+func (gp *GithubPRProvider) GetTasks(from *time.Time, to *time.Time, targetBranch string) (*[]infrastructure.Task, error) {
+	Settings.Providers.Github.GitRoot = Settings.Providers.GithubPRs.GitRoot
+	return NewGithubProvider(gp.repo).GetTasks(from, to, targetBranch)
 }
 
-func (gp *GithubProvider) ReleaseURL(from *string, to string) (*string, error) {
-	namespacedRepo, err := gp.namespacedRepo()
-	if err != nil {
-		return nil, err
-	}
-
-	if from != nil {
-		url := "https://github.com/" + *namespacedRepo + "/compare/" + *from + "..." + to
-		return &url, nil
-	}
-
-	url := "https://github.com/" + *namespacedRepo + "/commits" + to
-	return &url, nil
-}
-
-func (gp *GithubProvider) GetTask(taskId string) (*infrastructure.Task, error) {
+func (gp *GithubPRProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 
 	namespacedRepo, err := gp.namespacedRepo()
 	if err != nil {
@@ -299,17 +200,70 @@ func (gp *GithubProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 	return gitTask, nil
 }
 
-func (gp *GithubProvider) repoURL() (*string, error) {
+func (gp *GithubPRProvider) DefineCategory(task infrastructure.Task) application.Category {
+	var category = application.ADDED
+
+	if strings.HasPrefix(strings.ToLower(task.Title), "revert") {
+		return application.REMOVED
+	}
+
+	for _, label := range task.Labels {
+		switch label {
+		case Settings.Providers.Github.Labels[application.ADDED]:
+			category = application.ADDED
+			break
+		case Settings.Providers.Github.Labels[application.FIXED]:
+			category = application.FIXED
+			break
+		case Settings.Providers.Github.Labels[application.REFACTOR]:
+			category = application.REFACTOR
+			break
+		case Settings.Providers.Github.Labels[application.DEPRECATED]:
+			category = application.DEPRECATED
+			break
+		case Settings.Providers.Github.Labels[application.CHANGED]:
+			category = application.CHANGED
+			break
+		case Settings.Providers.Github.Labels[application.DEPENDENCIES]:
+			category = application.DEPENDENCIES
+			break
+		case Settings.Providers.Github.Labels[application.DOCUMENTATION]:
+			category = application.DOCUMENTATION
+			break
+		case Settings.Providers.Github.Labels[application.REMOVED]:
+			category = application.REMOVED
+			break
+		case Settings.Providers.Github.Labels[application.SECURITY]:
+			category = application.SECURITY
+			break
+		case Settings.Providers.Github.Labels[application.BREAKING_CHANGE]:
+			category = application.BREAKING_CHANGE
+			return category
+		default:
+			break
+		}
+	}
+
+	return category
+}
+
+func (gp *GithubPRProvider) ReleaseURL(from *string, to string) (*string, error) {
+	url := ""
+	return &url, nil
+}
+
+func (gp *GithubPRProvider) repoURL() (*string, error) {
 	if gp.repo != nil {
 		return gp.repo, nil
 	}
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 
-	if Settings.Providers.Github.GitRoot != "./" && Settings.Providers.Github.GitRoot != "." && Settings.Providers.Github.GitRoot != "" {
-		cwd = filepath.Join(cwd, Settings.Providers.Github.GitRoot)
+	if Settings.Providers.GithubPRs.GitRoot != "./" && Settings.Providers.GithubPRs.GitRoot != "." && Settings.Providers.GithubPRs.GitRoot != "" {
+		cwd = filepath.Join(cwd, Settings.Providers.GithubPRs.GitRoot)
 	}
 
 	r, err := git.PlainOpen(cwd)
@@ -320,7 +274,7 @@ func (gp *GithubProvider) repoURL() (*string, error) {
 	return &remotes[0].Config().URLs[0], nil
 }
 
-func (gp *GithubProvider) namespacedRepo() (*string, error) {
+func (gp *GithubPRProvider) namespacedRepo() (*string, error) {
 	currentGitBAseUrl, err := gp.repoURL()
 	if err != nil {
 		return nil, err
@@ -339,12 +293,12 @@ func (gp *GithubProvider) namespacedRepo() (*string, error) {
 	return &namespacedRepo, nil
 }
 
-func (gp *GithubProvider) getRepo(namespacedRepo string) string {
+func (gp *GithubPRProvider) getRepo(namespacedRepo string) string {
 	slice := strings.Split(namespacedRepo, "/")
 	return slice[1]
 }
 
-func (gp *GithubProvider) getOrg(namespacedRepo string) string {
+func (gp *GithubPRProvider) getOrg(namespacedRepo string) string {
 	slice := strings.Split(namespacedRepo, "/")
 	return slice[0]
 }

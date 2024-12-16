@@ -135,7 +135,7 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 
 		// Map each task to an application layer model to add it to the release
 		for _, task := range *tasks {
-			settings.Log.Debugf("-> %s %s\n", task.Name, task.Title)
+			settings.Log.Debugf("-> %s %s, %s\n", task.Name, task.ID, task.Category)
 			appTruncatedRelease.Sections[task.Category] =
 				append(appTruncatedRelease.Sections[task.Category],
 					*services.NewModelMapperService().InfraTaskToApplicationModel(task))
@@ -202,8 +202,13 @@ func (cgc *ChangelogGuardianController) GetFilledReleasesFromInfra(lastRelease *
 		}
 
 		if !lastReleaseContainsTask {
-			settings.Log.Debugf("-> %s %s\n", task.Name, task.Title)
-			category := cgc.releaseProvider.DefineCategory(task)
+			settings.Log.Debugf("-> %s %s, %s\n", task.Name, task.ID, task.Category)
+
+			category := cgc.taskProvider.DefineCategory(task)
+			if settings.Settings.CategoryFromPipes {
+				category = task.Category
+			}
+
 			unreleasedRelease.Sections[category] = append(unreleasedRelease.Sections[category],
 				*services.NewModelMapperService().InfraTaskToApplicationModel(task))
 		}
@@ -263,5 +268,6 @@ func (cgc *ChangelogGuardianController) throughTasksPipes(tasks []infra.Task) []
 		finalTasks = provisionalTasks
 		provisionalTasks = []infra.Task{}
 	}
+
 	return finalTasks
 }

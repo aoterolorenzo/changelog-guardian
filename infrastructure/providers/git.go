@@ -5,9 +5,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	application "gitlab.com/aoterocom/changelog-guardian/application/models"
-	settings "gitlab.com/aoterocom/changelog-guardian/config"
+	. "gitlab.com/aoterocom/changelog-guardian/config"
 	infrastructure "gitlab.com/aoterocom/changelog-guardian/infrastructure/models"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -28,6 +29,10 @@ func (gc *GitProvider) GetReleases(from *time.Time, to *time.Time) (*[]infrastru
 	path, err = os.Getwd()
 	if err != nil {
 		return nil, err
+	}
+
+	if Settings.Providers.Git.GitRoot != "./" && Settings.Providers.Git.GitRoot != "." && Settings.Providers.Git.GitRoot != "" {
+		path = filepath.Join(path, Settings.Providers.Git.GitRoot)
 	}
 
 	r, err := git.PlainOpen(path)
@@ -76,6 +81,10 @@ func (gc *GitProvider) GetTasks(from *time.Time, to *time.Time, targetBranch str
 	path, err = os.Getwd()
 	if err != nil {
 		return nil, err
+	}
+
+	if Settings.Providers.Git.GitRoot != "./" && Settings.Providers.Git.GitRoot != "." && Settings.Providers.Git.GitRoot != "" {
+		path = filepath.Join(path, Settings.Providers.Git.GitRoot)
 	}
 
 	r, err := git.PlainOpen(path)
@@ -148,6 +157,10 @@ func (gc *GitProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 		return nil, err
 	}
 
+	if Settings.Providers.Git.GitRoot != "./" && Settings.Providers.Git.GitRoot != "." && Settings.Providers.Git.GitRoot != "" {
+		path = filepath.Join(path, Settings.Providers.Git.GitRoot)
+	}
+
 	r, err := git.PlainOpen(path)
 	if err != nil {
 		return nil, err
@@ -159,7 +172,7 @@ func (gc *GitProvider) GetTask(taskId string) (*infrastructure.Task, error) {
 	}
 
 	err = w.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.ReferenceName(settings.Settings.DevelopBranch),
+		Branch: plumbing.ReferenceName(Settings.DevelopBranch),
 	})
 
 	commit, err := r.CommitObject(plumbing.NewHash(taskId))

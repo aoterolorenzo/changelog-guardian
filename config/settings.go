@@ -22,18 +22,30 @@ type GlobalSettings struct {
 	DevelopBranch    string `yaml:"defaultBranch"`
 	CGConfigPath     string `yaml:"cgConfigPath"`
 	Providers        struct {
+		Git struct {
+			GitRoot string `yaml:"gitRoot"`
+		} `yaml:"git"`
 		Gitlab struct {
-			Labels map[models.Category]string `yaml:"labels"`
+			Labels  map[models.Category]string `yaml:"labels"`
+			GitRoot string                     `yaml:"gitRoot"`
 		} `yaml:"gitlab"`
 		Github struct {
-			Labels map[models.Category]string `yaml:"labels"`
+			Labels  map[models.Category]string `yaml:"labels"`
+			GitRoot string                     `yaml:"gitRoot"`
 		} `yaml:"github"`
+		GithubPRs struct {
+			GHReleaseSearch string `yaml:"ghReleaseSearch"`
+			VersionRegex    string `yaml:"versionRegex"`
+			TargetBranch    string `yaml:"targetBranch"`
+			GitRoot         string `yaml:"gitRoot"`
+		} `yaml:"githubPRs"`
 	} `yaml:"providers"`
-	ReleaseProvider string   `yaml:"releaseProvider"`
-	TasksProvider   string   `yaml:"tasksProvider"`
-	ReleasePipes    []string `yaml:"releasePipes"`
-	TasksPipes      []string `yaml:"tasksPipes"`
-	TasksPipesCfg   struct {
+	ReleaseProvider   string   `yaml:"releaseProvider"`
+	TasksProvider     string   `yaml:"tasksProvider"`
+	CategoryFromPipes bool     `yaml:"categoryFromPipes"`
+	ReleasePipes      []string `yaml:"releasePipes"`
+	TasksPipes        []string `yaml:"tasksPipes"`
+	TasksPipesCfg     struct {
 		ConventionalCommits struct {
 			Categories map[models.Category]string `yaml:"categories"`
 		} `yaml:"conventional_commits"`
@@ -47,6 +59,10 @@ type GlobalSettings struct {
 				Inclusions []string `yaml:"included"`
 				Exclusions []string `yaml:"excluded"`
 			} `yaml:"labels"`
+			Regexps struct {
+				Inclusions []string `yaml:"included"`
+				Exclusions []string `yaml:"excluded"`
+			} `yaml:"regexps"`
 			Paths struct {
 				Inclusions []string `yaml:"included"`
 				Exclusions []string `yaml:"excluded"`

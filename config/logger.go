@@ -8,4 +8,5 @@ var Log *log.Logger
 
 func init() {
 	Log = log.New()
+	Log.SetLevel(log.TraceLevel)
 }
