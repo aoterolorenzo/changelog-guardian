@@ -7,6 +7,7 @@ require (
 	github.com/google/go-github/v41 v41.0.0
 	github.com/imdario/mergo v0.3.12
 	github.com/joho/godotenv v1.4.0
+	github.com/k0kubun/pp/v3 v3.4.1
 	github.com/magiconair/properties v1.8.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
@@ -46,8 +47,8 @@ require (
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/net v0.0.0-20210326060303-6b1517762897 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
-	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
@@ -58,5 +59,7 @@ require (
 require (
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/trivago/tgo v1.0.7 // indirect
 )
