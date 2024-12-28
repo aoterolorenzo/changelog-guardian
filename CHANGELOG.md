@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [![Unreleased]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/v1.0.0...develop)
 
+## [![1.7.0]![2024-12-28]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.6.0...1.7.0)
+
+### ![Added]
+
+- ✨ [!106](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/106) Release 1.7.0 ([@aoterocom](https://gitlab.com/aoterocom))
+- ✨ [!104](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/104) Added Github from PR releases support (GithubPRs provider) ([@aoterocom](https://gitlab.com/aoterocom))
+
 ## [![1.6.0]![2023-11-25]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.5.0...1.6.0)
 
 ### ![Added]
@@ -136,6 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🏗 [!19](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/19) Rebrand middleware / filters into Pipes ([@aoterocom](https://gitlab.com/aoterocom))
 
 [Unreleased]: https://img.shields.io/badge/-Unreleased-blueviolet?&style=for-the-badge
+[1.7.0]: https://img.shields.io/badge/Release-1.7.0-blueviolet?&style=for-the-badge
+[2024-12-28]: https://img.shields.io/badge/-2024--12--28-white?&style=for-the-badge
 [1.6.0]: https://img.shields.io/badge/Release-1.6.0-blueviolet?&style=for-the-badge
 [2023-11-25]: https://img.shields.io/badge/-2023--11--25-white?&style=for-the-badge
 [1.5.0]: https://img.shields.io/badge/Release-1.5.0-blueviolet?&style=for-the-badge
