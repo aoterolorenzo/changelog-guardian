@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -282,6 +283,11 @@ func (gp *GitlabProvider) repoURL() (*string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if Settings.Providers.Gitlab.GitRoot != "./" && Settings.Providers.Gitlab.GitRoot != "." && Settings.Providers.Gitlab.GitRoot != "" {
+		cwd = filepath.Join(cwd, Settings.Providers.Gitlab.GitRoot)
+	}
+
 	r, err := git.PlainOpen(cwd)
 	if err != nil {
 		return nil, err

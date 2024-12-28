@@ -3,6 +3,7 @@ package helpers
 import (
 	"os"
 	"reflect"
+	"regexp"
 )
 
 func ReverseAny(s interface{}) {
@@ -34,6 +35,17 @@ func SaveStringToFile(filePath string, str string) error {
 func SliceContainsString(slice []string, str string) bool {
 	for _, a := range slice {
 		if a == str {
+			return true
+		}
+	}
+	return false
+}
+
+func StringMatchesRegexSlice(regexSlice []string, str string) bool {
+	for _, a := range regexSlice {
+		var compRegEx = regexp.MustCompile(a)
+		regexMatch := len(compRegEx.FindStringSubmatch(str)) > 0
+		if regexMatch {
 			return true
 		}
 	}

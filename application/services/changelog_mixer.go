@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"gitlab.com/aoterocom/changelog-guardian/application/models"
 	"gitlab.com/aoterocom/changelog-guardian/helpers"
 	"sort"
@@ -113,8 +112,6 @@ func (cm *ChangelogMixer) parseRemovals(changelog models.Changelog) models.Chang
 				}
 
 				for _, taskT := range sectionT {
-					fmt.Println(task.Title)
-					fmt.Println(taskT.Title)
 					if task.ID == taskT.ID || task.Title == taskT.Title ||
 						strings.ToLower(task.Title) == "revert \""+strings.ToLower(taskT.Title)+"\"" {
 						// REMOVE both
