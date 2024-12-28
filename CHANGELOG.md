@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ![Added]
 
-- ✨ [!106](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/106) Release 1.7.0 ([@aoterocom](https://gitlab.com/aoterocom))
 - ✨ [!104](https://gitlab.com/aoterocom/changelog-guardian/-/merge_requests/104) Added Github from PR releases support (GithubPRs provider) ([@aoterocom](https://gitlab.com/aoterocom))
 
 ## [![1.6.0]![2023-11-25]](https://gitlab.com/aoterocom/changelog-guardian/-/compare/1.5.0...1.6.0)
